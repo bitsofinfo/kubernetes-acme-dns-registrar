@@ -1,0 +1,15 @@
+kubernetes
+fastapi
+uvicorn[standard]
+python-dotenv
+fastapi-health
+simplejson
+requests
+
+k8swatcher
+
+azure-mgmt-dns
+azure-mgmt-privatedns
+azure-identity
+msrestazure
+pyyaml

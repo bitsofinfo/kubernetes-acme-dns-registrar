@@ -1,0 +1,24 @@
+dns_providers:
+
+  azuredns:
+
+    # common settings
+    subscription_id: xxx
+    tenant_id: yyy
+    client_id: zzz
+
+    zones:
+
+      ha901.net:
+        resource_group_name: some-rg,
+        zone_name: my-domain.net
+        ttl: 300
+        includes: 
+          - ".+\\.my-domain\\.net"
+        excludes": null,
+
+        # optional can override settings here per zone
+        #subscription_id: xxx
+        #tenant_id: yyy
+        #client_id: zzz
+

@@ -1,0 +1,6 @@
+zone_configs:
+  ha901.net:
+    includes:
+      - .+\.my-domain\.net
+    excludes: null
+    acme_dns_registration_url: http://auth.my-domain.net/register

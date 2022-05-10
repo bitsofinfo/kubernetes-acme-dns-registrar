@@ -1,0 +1,10 @@
+k8s_watch_configs:
+  - id: all_ingress_edg-apps
+    namespace: my-apps
+    kind: Ingress
+    sdk_client_class_name: NetworkingV1Api
+    sdk_list_function_name: list_ingress_for_all_namespaces
+    field_selector: null
+    label_selector: null
+    suppress_bookmarks: true
+    include_k8s_objects: true
