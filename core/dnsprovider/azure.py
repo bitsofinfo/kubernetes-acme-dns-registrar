@@ -123,8 +123,6 @@ class BaseAzureDnsProvider(DnsProvider):
             raise Exception(f"ensure_cname_for_acme_dns() {self.get_dns_provider_name()} misconfiguration, I am not enabled, yet i was invoked!")
 
         try:
-            self.logger.debug(f"ensure_cname_for_acme_dns() {self.get_dns_provider_name()} processing {name} -> {cname_target}")
-
             zone_config = self.get_zone_config(name)
             
             if not zone_config:
@@ -136,6 +134,8 @@ class BaseAzureDnsProvider(DnsProvider):
             # https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/network/azure-mgmt-dns/azure/mgmt/dns/v2018_05_01/models/_models_py3.py#L288
             record_set_params = self.get_record_set_params(name,cname_target,relative_record_set_name,zone_config)
             record_set:RecordSet = self.get_azure_dns_client_instance().record_sets.create_or_update(**record_set_params)
+
+            self.logger.debug(f"ensure_cname_for_acme_dns() {self.get_dns_provider_name()} processed {name} ({relative_record_set_name}) -> {cname_target}")
 
             return EnsureCNAMEResult(dns_cname_id=record_set.id, \
                                     dns_cname_provider=self.get_dns_provider_name(), \
