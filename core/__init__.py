@@ -14,6 +14,7 @@ import json
 import asyncio
 import os
 from pathlib import Path, PurePath
+import sys
 import importlib
 class CNAMEServiceSettings(SmartSettings):
     KADR_K8S_WATCHER_CONFIG_YAML:str
@@ -73,7 +74,7 @@ class DnsProviderProcessor(Thread):
 
                 for provider_name, dns_provider in self.dns_providers.items():
 
-                    self.logger.debug(f"process_dns_registration_events() -> {dns_provider.get_dns_provider_name()}")
+                    self.logger.debug(f"process_dns_registration_events() invoking ensure_cname_for_acme_dns() -> {dns_provider.get_dns_provider_name()}")
 
                     ensure_cname_result:EnsureCNAMEResult = \
                                 dns_provider.ensure_cname_for_acme_dns(\
@@ -82,13 +83,16 @@ class DnsProviderProcessor(Thread):
            
                     registration.dns_cname_id = ensure_cname_result.dns_cname_id
                     registration.dns_cname_provider = ensure_cname_result.dns_cname_provider
-                    registration.dns_cname_record_json = json.dumps(ensure_cname_result.dns_cname_record.as_dict())
+                    registration.dns_cname_record_json = json.dumps(ensure_cname_result.dns_cname_record)
                     registration.dns_cname_updated_at = ensure_cname_result.dns_cname_updated_at
 
                     self.registration_store.put_registration(registration)
 
+                    self.logger.debug(f"process_dns_registration_events() successfully completed for: {dns_provider.get_dns_provider_name()}")
+
         except Exception as e:
-            pass
+            self.logger.exception(f"process_dns_registration_events() unexpected error: {str(sys.exc_info()[:2])}")
+
         
     def run(self):
         self.logger.debug("DnsProviderProcessor() starting run of process_dns_registration_events()....")
