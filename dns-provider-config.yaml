@@ -9,7 +9,7 @@ dns_providers:
 
     zones:
 
-      ha901.net:
+      my-domain.net:
         resource_group_name: some-rg,
         zone_name: my-domain.net
         ttl: 300

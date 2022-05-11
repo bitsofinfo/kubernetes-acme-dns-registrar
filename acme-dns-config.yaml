@@ -1,5 +1,5 @@
 zone_configs:
-  ha901.net:
+  my-domain.net:
     includes:
       - .+\.my-domain\.net
     excludes: null
