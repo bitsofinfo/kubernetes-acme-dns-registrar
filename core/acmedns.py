@@ -40,36 +40,20 @@ class ACMEDnsRegistrar(Thread):
 
         re_compile_patterns(self.zone_configs,["includes","excludes"])
 
-    def any_pattern_matches(self, patterns:List[Pattern], value:str):
-        if patterns and len(patterns) > 0:
-            for p in patterns:
-                if p.match(value):
-                    return True
-
-        return False
-
-
-    def get_zone_config(self, domain_name) -> dict: 
-        for conf_name, config in self.zone_configs.items():
-            if self.any_pattern_matches(config["excludes"],domain_name):
-                continue
-            if self.any_pattern_matches(config["includes"],domain_name):
-                return config
+    def get_zone_config(self, domain_name):
+        return find_config(self.zone_configs, domain_name)
 
     def run(self):
         try:
            while True:
                 domain_name_event:DomainNameEvent = self.domain_name_event_queue.get()
 
-                print(simplejson.dumps(domain_name_event.dict(),indent=2, default=str))
-
                 registration:Registration = \
                    self.registration_store.get_registration(domain_name_event.domain_name)
 
                 if not registration:
-
+ 
                     zone_config = self.get_zone_config(domain_name_event.domain_name)
-
                     acme_dns_registration_url = zone_config["acme_dns_registration_url"]
                     acme_dns_registration_response = requests.post(zone_config["acme_dns_registration_url"], data=None)
 
