@@ -49,3 +49,7 @@ class Registration(BaseModel):
 class AcmeDnsRegistationEvent(BaseModel):
     event_at:datetime = datetime.utcnow()
     registration:Registration
+
+class AuthorizedPrincipal(BaseModel):
+    principal_id:str
+    authorizations:Optional[List[str]]

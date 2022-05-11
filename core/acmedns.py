@@ -52,6 +52,8 @@ class ACMEDnsRegistrar(Thread):
                    self.registration_store.get_registration(domain_name_event.domain_name)
 
                 if not registration:
+
+                    self.logger.debug(f"run() no Registration record exists for {domain_name_event.domain_name} ... creating")
  
                     zone_config = self.get_zone_config(domain_name_event.domain_name)
                     acme_dns_registration_url = zone_config["acme_dns_registration_url"]
@@ -77,6 +79,8 @@ class ACMEDnsRegistrar(Thread):
 
                     self.registration_store.put_registration(registration)
 
+                    self.logger.debug(f"run() new Registration record created OK for {domain_name_event.domain_name} target: {acme_dns_registration.fulldomain}")
+
                 acme_dns_register_event:AcmeDnsRegistationEvent = \
                         AcmeDnsRegistationEvent(registration=registration)
 
@@ -84,5 +88,3 @@ class ACMEDnsRegistrar(Thread):
             
         except Exception as e : 
             self.logger.exception(f"ACMEDnsRegistrar().run() unexpected error: {str(sys.exc_info()[:2])}")
-        finally:
-            pass

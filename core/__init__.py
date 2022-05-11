@@ -16,7 +16,8 @@ import os
 from pathlib import Path, PurePath
 import sys
 import importlib
-class CNAMEServiceSettings(SmartSettings):
+from .health import HealthcheckParticipant, HealthcheckResult
+class RegistrarServiceSettings(SmartSettings):
     KADR_K8S_WATCHER_CONFIG_YAML:str
 
 class DnsProviderProcessor(Thread):
@@ -98,9 +99,17 @@ class DnsProviderProcessor(Thread):
         self.logger.debug("DnsProviderProcessor() starting run of process_dns_registration_events()....")
         self.process_dns_registration_events()
                
-class CNAMEService():
+class RegistrarService(Thread, HealthcheckParticipant):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('daemon', True)
+        super().__init__(*args, **kwargs)
 
-    def __init__(self):
+    def get_registration_store(self) -> RegistrationStore:
+        return self.registration_store
+
+    def run(self):
+        self.logger = LogService("RegistrarService").logger
+
         self.domain_name_event_queue:Queue = Queue()
         self.acme_dns_registration_queue:Queue = Queue()
 
@@ -119,14 +128,37 @@ class CNAMEService():
         acme_dns_registrar.start()
         dns_provider_processor.start()
 
+        self.logger.debug("__init__() RegistrarService started OK...")
+
         acme_dns_registrar.join()
         dns_provider_processor.join()
-
         self.k8s_watcher_service.join()
+        
+
+    def get_check_health_functions(self) -> List[callable]:
+        return [self.check_registrar_health]
+
+    async def check_registrar_health(self) -> HealthcheckResult:
+
+        try:
+            messages = []
+            details = {}
+            overall_success = True
+
+            # TODO: implement checks
+
+            return HealthcheckResult(success=overall_success, \
+                    message=", ".join(messages),
+                    details=details)
+
+        except Exception as e:
+            return HealthcheckResult(success=False, \
+                    message=f'RegistrarService check(s) failed? {str(sys.exc_info()[:2])}',
+                    details=details)
 
     def init_configs(self):
 
-        self.settings = CNAMEServiceSettings()
+        self.settings = RegistrarServiceSettings()
 
         k8s_watcher_config =self.settings.get_from_yaml("KADR_K8S_WATCHER_CONFIG_YAML")
 

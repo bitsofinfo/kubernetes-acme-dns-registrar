@@ -1,8 +1,12 @@
 kubernetes
 fastapi
 uvicorn[standard]
-python-dotenv
 fastapi-health
+python-jose[cryptography]
+passlib[argon2]
+
+python-dotenv
+python-multipart
 simplejson
 requests
 
