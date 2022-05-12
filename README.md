@@ -132,4 +132,5 @@ Once you start up the registrar, you can access the following endpoints:
 
 ## related projects
 
+https://github.com/joohoi/acme-dns
 https://github.com/bitsofinfo/k8swatcher
