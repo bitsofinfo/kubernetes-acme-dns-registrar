@@ -11,6 +11,8 @@ Watches k8s resources (ingress objects etc) to trigger acme-dns registrations an
   - [Docker Run manual:](#docker-run-manual)
   - [Docker Run with .env file:](#docker-run-with-env-file)
   - [API](#api)
+
+![](docs/diag1.svg)
 # local dev
 
 ```
