@@ -23,7 +23,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials, utils
 
 from starlette.requests import Request
-from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_500_INTERNAL_SERVER_ERROR
+from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_404_NOT_FOUND
 
 from pydantic import BaseModel, BaseSettings
 
@@ -135,10 +135,38 @@ async def get_authorized_principal(request:Request) -> AuthorizedPrincipal:
 @app.get("/registrations/{name:path}")
 async def get_registrations(name:Optional[str], \
                             invoking_principal:AuthorizedPrincipal=Depends(get_authorized_principal)):
-    if not name:
-        return await registrar_service.get_registration_store().get_all()
-    else:
-        return {name:await registrar_service.get_registration_store().get_by_name(name)}
+    
+    try:
+        if not name:
+            return await registrar_service.get_registration_store().get_all()
+        else:
+
+            registration = await registrar_service.get_registration_store().get_by_name(name)
+
+            if not registration:
+                raise HTTPException(
+                    status_code=HTTP_404_NOT_FOUND,
+                    detail=f"{name} not found",
+                    headers=None
+                )
+
+            return {name:registration}
+
+    except HTTPException as e:
+        raise e
+
+    except Exception as e:
+        error_id = str(uuid.uuid4())
+        status_code = HTTP_500_INTERNAL_SERVER_ERROR
+        headers = {"X-KADR-ERROR-ID": error_id}
+        detail = str(sys.exc_info()[:2])
+        logger.exception("get_registrations() unexpected error: {detail}")
+
+        raise HTTPException(
+            status_code=status_code,
+            detail=detail,
+            headers=headers
+        )
 
 
 def get_security_gate():
