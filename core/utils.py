@@ -30,4 +30,7 @@ def find_config(config_map:dict, to_match) -> dict:
             return config
 
 def get_relative_recordset_name(name:str, zone_name:str):
-    return f"_acme-challenge.{name.replace('.'+zone_name,'').replace('*.','')}"
+    hostname = name.replace(zone_name,'').replace('*','').strip('.')
+    if hostname:
+        hostname = f".{hostname}"
+    return f"_acme-challenge{hostname}"
