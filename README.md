@@ -65,7 +65,7 @@ docker run \
     -e KADR_DNS_PROVIDER_SECRETS_YAML=file@/opt/scripts/dns-provider-secrets.yaml \
     -e KADR_JWT_SECRET_KEY=123 \
     -e KADR_K8S_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
-    -e KADR_K8S_CONTEXT_NAME=edg-eastus-rnd2-nuc-test-001-aks \
+    -e KADR_K8S_CONTEXT_NAME=my-k8s-context \
         \
     kubernetes-acme-dns-registrar:0.0.1
 ```
