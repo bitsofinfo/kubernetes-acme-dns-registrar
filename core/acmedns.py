@@ -48,23 +48,46 @@ class ACMEDnsRegistrar(Thread):
            while True:
                 domain_name_event:DomainNameEvent = self.domain_name_event_queue.get()
 
+                self.logger.debug(f"run() received DomainNameEvent for {domain_name_event.type} {domain_name_event.domain_name}")
+
                 registration:Registration = \
                    self.registration_store.get_registration(domain_name_event.domain_name)
 
-                if not registration:
+                if registration:
+                    self.logger.debug(f"run() existing Registration record exists for {domain_name_event.domain_name} ... updating latest event meta-data")
+ 
+                    registration.updated_at = datetime.utcnow()
+                    registration.last_event_type = domain_name_event.type
+                    registration.source_domain_name_event = domain_name_event
+
+                elif not registration:
+                    
+                    if domain_name_event.type == DomainNameEventType.DELETED:
+                        self.logger.debug(f"run() we don't process DELETED DomainNameEvent's ignoring: {domain_name_event.type} {domain_name_event.domain_name}")
+                        continue
 
                     self.logger.debug(f"run() no Registration record exists for {domain_name_event.domain_name} ... creating")
  
                     zone_config = self.get_zone_config(domain_name_event.domain_name)
                     acme_dns_registration_url = zone_config["acme_dns_registration_url"]
-                    acme_dns_registration_response = requests.post(zone_config["acme_dns_registration_url"], data=None)
+                    acme_dns_registration_url = zone_config["acme_dns_registration_url"]
+                    acme_dns_registration_response = requests.post(acme_dns_registration_url, data=None)
+
+                    self.logger.debug(f"run() POSTed registration @ {acme_dns_registration_url} for {domain_name_event.domain_name} OK")
+ 
 
                     acme_dns_registration:AcmeDnsRegistration = \
                             AcmeDnsRegistration(**acme_dns_registration_response.json())
 
+                    # make this configurable
+                    acme_dns_registration.username = "REMOVED"
+                    acme_dns_registration.password = "REMOVED"
+
                     registration = Registration(**{
                         "created_at": datetime.utcnow(),
                         "updated_at": datetime.utcnow(),
+
+                        "last_event_type": domain_name_event.type,
                         
                         "acme_dns_registered_at": datetime.utcnow(),
                         "acme_dns_registration": acme_dns_registration,
@@ -77,9 +100,11 @@ class ACMEDnsRegistrar(Thread):
                         "source_domain_name_event": domain_name_event
                     })
 
-                    self.registration_store.put_registration(registration)
 
-                    self.logger.debug(f"run() new Registration record created OK for {domain_name_event.domain_name} target: {acme_dns_registration.fulldomain}")
+
+                self.registration_store.put_registration(registration)
+
+                self.logger.debug(f"run() local Registration record PUT OK in local RegistrationStore for {domain_name_event.domain_name} target: {acme_dns_registration.fulldomain}")
 
                 acme_dns_register_event:AcmeDnsRegistationEvent = \
                         AcmeDnsRegistationEvent(registration=registration)

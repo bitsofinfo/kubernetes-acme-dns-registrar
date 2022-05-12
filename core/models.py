@@ -30,6 +30,8 @@ class AcmeDnsRegistration(BaseModel):
 class Registration(BaseModel):
     created_at:datetime
     updated_at:datetime
+
+    last_event_type:DomainNameEventType
     
     acme_dns_registered_at:datetime
     acme_dns_registration:AcmeDnsRegistration
