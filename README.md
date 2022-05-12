@@ -11,6 +11,7 @@ Watches k8s resources (ingress objects etc) to trigger acme-dns registrations an
   - [Docker Run manual:](#docker-run-manual)
   - [Docker Run with .env file:](#docker-run-with-env-file)
   - [API](#api)
+  - [related projects](#related-projects)
 
 ![](docs/diag1.svg)
 # local dev
@@ -128,3 +129,7 @@ Once you start up the registrar, you can access the following endpoints:
 * `GET /docs` - FastAPI swagger docs
 * `POST /oauth2/token` - Acquire an OAuth2 `client_credentials` grant token (username/pw basic auth OR via `client_id/client_secret` FORM post params)
 * `GET /registrations[/{name}]` - View the registrar's `Registration` database records
+
+## related projects
+
+https://github.com/bitsofinfo/k8swatcher
