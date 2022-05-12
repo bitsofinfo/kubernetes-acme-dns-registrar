@@ -1,19 +1,19 @@
-kubernetes
-fastapi
-uvicorn[standard]
-fastapi-health
-python-jose[cryptography]
-passlib[argon2]
+kubernetes==23.6.0
+fastapi==0.77.1
+uvicorn[standard]==0.17.6
+fastapi-health==0.4.0
+python-jose[cryptography]==3.3.0
+passlib[argon2]==1.7.4
 
-python-dotenv
-python-multipart
-simplejson
-requests
+python-dotenv==0.20.0
+python-multipart==0.0.5
+simplejson==3.17.6
+requests==2.27.1
 
-k8swatcher
+k8swatcher==0.0.2
 
-azure-mgmt-dns
-azure-mgmt-privatedns
-azure-identity
-msrestazure
-pyyaml
+azure-mgmt-dns==8.0.0
+azure-mgmt-privatedns==1.0.0
+azure-identity==1.10.0
+msrestazure==0.6.4
+pyyaml==6.0

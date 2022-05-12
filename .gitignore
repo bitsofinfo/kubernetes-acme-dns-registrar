@@ -1,6 +1,10 @@
 *.ve 
 dev.*.yaml
-dns.py
+*.pem
+*.csr
+secrets.env
+secrets*
+*.secret
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

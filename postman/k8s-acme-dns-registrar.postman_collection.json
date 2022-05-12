@@ -1,0 +1,126 @@
+{
+	"info": {
+		"_postman_id": "64713b19-a202-454c-af6c-c4dd86e28438",
+		"name": "k8s-acme-dns-registrar",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/registrations",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{bearer_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{ROOT_URL}}/registrations",
+					"host": [
+						"{{ROOT_URL}}"
+					],
+					"path": [
+						"registrations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/registrations/my-domain.net",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{bearer_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{ROOT_URL}}/registrations/my-domain.net",
+					"host": [
+						"{{ROOT_URL}}"
+					],
+					"path": [
+						"registrations",
+						"my-domain.net"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/oauth2/token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"bearer_token\", jsonData.access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "test2",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "123",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "execute",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{ROOT_URL}}/oauth2/token",
+					"host": [
+						"{{ROOT_URL}}"
+					],
+					"path": [
+						"oauth2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
