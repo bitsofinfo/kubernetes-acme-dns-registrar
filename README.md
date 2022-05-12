@@ -12,6 +12,7 @@ Watches k8s resources (ingress objects etc) to trigger acme-dns registrations an
   - [Docker Run with .env file:](#docker-run-with-env-file)
   - [API](#api)
   - [related projects](#related-projects)
+  - [TODO](#todo)
 
 ![](docs/diag1.svg)
 # local dev
@@ -135,3 +136,7 @@ Once you start up the registrar, you can access the following endpoints:
 https://github.com/joohoi/acme-dns  
 
 https://github.com/bitsofinfo/k8swatcher
+
+## TODO
+
+* update acme-dns solver secret w/ registrations
