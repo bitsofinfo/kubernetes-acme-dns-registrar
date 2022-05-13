@@ -33,7 +33,7 @@ In the context of this conversation however, you can skip the manual API calls t
 
 ## 4. Install cert-manager
 
-The workhorse of the automatic TLS certificate acquisition and management is [cert-manager](https://cert-manager.io/docs/installation/]. You are going to need to [install cert-manager](https://cert-manager.io/docs/installation/) on your cluster
+The workhorse of the automatic TLS certificate acquisition and management is [cert-manager](https://cert-manager.io/docs/installation/). You are going to need to [install cert-manager](https://cert-manager.io/docs/installation/) on your cluster
 
 Here is an example using `helm`:
 
