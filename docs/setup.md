@@ -6,7 +6,7 @@ Trying to figure out an entire dynamic tls certificate solution in kubernetes ca
 - [2. Setup a DNS name server(s)](#2-setup-a-dns-name-servers)
 - [3. Setup acme-dns](#3-setup-acme-dns)
 - [4. Install cert-manager](#4-install-cert-manager)
-- [5. Create the acme-dns.json secret](#5-create-the-acme-dnsjson-secret)
+- [5. Seed the acme-dns.json k8s secret](#5-seed-the-acme-dnsjson-k8s-secret)
 - [6. Configure an cert-manager Issuer for lets-encrypt](#6-configure-an-cert-manager-issuer-for-lets-encrypt)
 - [7. Install kubernetes-acme-dns-registrar](#7-install-kubernetes-acme-dns-registrar)
 ## 1. Get a kubernetes cluster
@@ -54,7 +54,7 @@ helm upgrade \
 
   You can read on your own about the uses of `--max-concurrent-challenges` and `--dns01-recursive-nameservers-only` on your own. One key thing about `--dns01-recursive-nameservers-only` is that it forces `cert-manager` to not use a local dns server on the network, (that might be your private dns server) for which you are trying to get a certificate for, hence leading it to not being able to find it, which is what [acme-dns](https://github.com/joohoi/acme-dns) is there for (i.e. as a front for all your zone's challenges, even the private zones)
 
-## 5. Create the acme-dns.json secret
+## 5. Seed the acme-dns.json k8s secret
 
 Our goal here is to configure a [cert-manager [Cluster]Issuer](https://cert-manager.io/docs/configuration/acme/#creating-a-basic-acme-issuer) for `lets-encrypt` using a [DNS01 solver](https://cert-manager.io/docs/configuration/acme/dns01/) using [ACMEDNS challenge provider](https://cert-manager.io/docs/configuration/acme/dns01/)....but in order to do that we need a pre-requisite to be done... configure the `acme-dns.json` secret that will contain all the `acme-dns` registrations.
 
