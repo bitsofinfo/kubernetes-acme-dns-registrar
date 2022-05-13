@@ -91,7 +91,7 @@ At this point `cert-manager`, `acme-dns` and `lets-encrypt` take over for items 
 
 Trying to figure out an entire dynamic tls certificate solution in kubernetes can be daunting. [This guide(docs/setup.md) will try to point you in the right direction by laying out the general guideposts and order of operations. 
 
-Please check-out [docs/setup]((docs/setup.md))
+Please check-out [docs/setup](docs/setup.md)
 # local dev
 
 ```
