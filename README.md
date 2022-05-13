@@ -89,14 +89,9 @@ At this point `cert-manager`, `acme-dns` and `lets-encrypt` take over for items 
 
 ## overview of overall setup
 
-1. setup an and configure [acme-dns](https://github.com/joohoi/acme-dns) instance
-1. install cert-manager
-   1. create an `acme-dns` secret w/ an empty set of `acme-dns.json` registrations
-   2. configure a `[Cluster]Issuer` w/ a `DNS01` solver of type `acmeDNS` pointing to the [acme-dns](https://github.com/joohoi/acme-dns) instance you set up in step 1 and referencing the secret above
-1. install and configure `kubernetes-acme-dns-registrar`
+Trying to figure out an entire dynamic tls certificate solution in kubernetes can be daunting. [This guide(docs/setup.md) will try to point you in the right direction by laying out the general guideposts and order of operations. 
 
-
-2. 
+Please check-out [docs/setup]((docs/setup.md))
 # local dev
 
 ```
