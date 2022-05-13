@@ -27,7 +27,7 @@ This project attempts to address the manual steps as described here in the [cert
 
 This project provides some additional automation to help make your life easier when using the **awesome** [acme-dns DNS challenge server](https://github.com/joohoi/acme-dns). The diagram below shows a sample architecture where this project can be utilized to automate the typically manual [acme-dns registration](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) steps that one must take per-domain prior to having [cert-manager](https://cert-manager.io/) do its work. 
 
-*note, the `load-balancers`, `Ingress/Controllers`, `external-dns` and `dns server` componments in this diagram are just here as an example architecture. They key function of `kubernetes-acme-dns-registrar` is listening for kubernetes events, to drive the automation of `cert-manager` based TLS certificate issuance via `acme-dns`. Currently watching `Ingress` objects is supported, but PRs are welcome to add support for watching any other kubernetes `kinds`!*
+*note, the `load-balancers`, `Ingress/Controllers`, `external-dns` and `dns server` components in this diagram are just here as an example architecture. They key function of `kubernetes-acme-dns-registrar` is listening for kubernetes events, to drive the automation of `cert-manager` based TLS certificate issuance via `acme-dns`. Currently watching `Ingress` objects is supported, but PRs are welcome to add support for watching any other kubernetes `kinds`!*
 
 ![](docs/diag1.svg)
 
