@@ -33,7 +33,7 @@ This project provides some additional automation to help make your life easier w
 
 ### example output
 
-Here are some example logs showing what this does, here we are detecting 2 new domain names from the `tls.hosts` section of an `Ingress` object that gets deployed on kubernetes. We react by creating a new registration in `acme-dns`, saving the meta-data to our local storage, updating the `acme-dns` kubernetes secret and then use the `azuredns` provider to automatically create the `CNAME` pointer to the `acme-dns` subdomin so that that `cert-manager` can fulfill the negotiation w/ `lets-encrypt` to issue the certificate for the `Ingress'`
+Here are some example logs showing what this does, here we are detecting one new domain name from the `tls.hosts` section of an `Ingress` object that gets deployed on kubernetes. We react by creating a new registration in `acme-dns`, saving the meta-data to our local storage, updating the `acme-dns` kubernetes secret and then use the `azuredns` provider to automatically create the `CNAME` pointer to the `acme-dns` subdomin so that that `cert-manager` can fulfill the negotiation w/ `lets-encrypt` to issue the certificate for the `Ingress'`
 
 On startup and until stopped, we watch for `Ingress` events via [k8swatcher](https://bitsofinfo/k8swatcher)
 ```bash
