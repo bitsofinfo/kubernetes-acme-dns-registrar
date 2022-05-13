@@ -1,6 +1,6 @@
 # kubernetes-acme-dns-registrar <!-- omit in TOC -->
 
-Watches k8s resources (ingress objects etc) to trigger automatic [acme-dns registrations](https://github.com/joohoi/acme-dns), [cert-manager ACMEDNS solver secret updates](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) and finally the required subdomain CNAME record creation across various DNS providers. 
+Watches k8s resources (ingress objects etc) to trigger automatic [acme-dns registrations](https://github.com/joohoi/acme-dns), [cert-manager ACMEDNS solver secret updates](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) and finally the required subdomain CNAME record creation across various DNS providers. (wildcards supported)
 
 This project attempts to address the manual steps as described here in the [cert-manager dns01 acme-dns solver documentation](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) by fully automating the following steps:
 
@@ -62,29 +62,48 @@ KADR_JWT_SECRET_KEY=123 \
 
 ## example output
 
-Here are some example logs showing what this does, here we are detecting 2 new domain names from the `tls.hosts` section of an `Ingress` object that gets deployed on kubernetes. We react by creating a new registration in `acme-dns`, saving the meta-data to our local storage, and then use the `azuredns` provider to automatically create the `CNAME` pointer to the `acme-dns` subdomin so that that `cert-manager` can fulfill the negotiation w/ `lets-encrypt` to issue the certificate for the `Ingress'`
+Here are some example logs showing what this does, here we are detecting 2 new domain names from the `tls.hosts` section of an `Ingress` object that gets deployed on kubernetes. We react by creating a new registration in `acme-dns`, saving the meta-data to our local storage, updating the `acme-dns` kubernetes secret and then use the `azuredns` provider to automatically create the `CNAME` pointer to the `acme-dns` subdomin so that that `cert-manager` can fulfill the negotiation w/ `lets-encrypt` to issue the certificate for the `Ingress'`
 
-```
-K8sWatcher - DEBUG - K8sWatcher() loading kube config: k8s_config_file_path=/opt/scripts/kubeconfig.secret k8s_config_context_name=myk8scontext (Note: 'None' = using defaults)
+On startup and until stopped, we watch for `Ingress` events via [k8swatcher](https://bitsofinfo/k8swatcher)
+```bash
+K8sWatcher - DEBUG - K8sWatcher() loading kube config: k8s_config_file_path=/opt/scripts/kubeconfig.secret k8s_config_context_name=myk8sctx (Note: 'None' = using defaults)
 K8sWatcher - DEBUG - __iter__() processing K8sWatchConfig[kind=Ingress]
 K8sWatcher - DEBUG - handle_k8s_object_list() processing K8sWatchConfig[kind=Ingress]
+AcmeDnsK8sSecretStore - DEBUG - AcmeDnsK8sSecretStore() managing cert-manager acmedns dns solver secret @ namespace=cert-manager name=acme-dns key=acme-dns.json
+AcmeDnsK8sSecretStore - DEBUG - AcmeDnsK8sSecretStore() loading kube config: k8s_config_file_path=/opt/scripts/kubeconfig.secret k8s_config_context_name=myk8sctx (Note: 'None' = using defaults)
+K8sWatcher - DEBUG - __iter__() processing K8sWatchConfig[kind=Ingress]
+K8sWatcher - DEBUG - handle_k8s_object_watch() processing K8sWatchConfig[kind=Ingress]
+```
+
+We load any [dnsproviders](core/dnsprovider) we have configured (currently only `azure` is supported, PRs welcome) and k8s events come in, we react:
+```
 BaseAzureDnsProvider azuredns - DEBUG - AzureDnsProvider azuredns enabled
 DnsProviderProcessor - DEBUG - load_dns_providers() registered DnsProvider: azuredns
 DnsProviderProcessor - DEBUG - DnsProviderProcessor() starting run of process_dns_registration_events()....
 RegistrarService - DEBUG - __init__() RegistrarService started OK...
-K8sWatcher - DEBUG - __iter__() processing K8sWatchConfig[kind=Ingress]
-K8sWatcher - DEBUG - handle_k8s_object_watch() processing K8sWatchConfig[kind=Ingress]
-ACMEDnsRegistrar - DEBUG - run() no Registration record exists for *.int.mydomain.net ... creating
-ACMEDnsRegistrar - DEBUG - run() new Registration record created OK for *.int.mydomain.net target: 66dbc160-2952-40f0-8a76-013423cfc9aa.auth.mydomain.net
-ACMEDnsRegistrar - DEBUG - run() no Registration record exists for my-service.int.mydomain.net ... creating
+```
+
+(#1) we create a [acme-dns](https://github.com/joohoi/acme-dns) registration for the subdomain and (#2) save the registration in our local db. We only do this if we have not registered this name previously.
+```
+ACMEDnsRegistrar - DEBUG - run() received DomainNameEvent for LOADED *.mydomain.net
+ACMEDnsRegistrar - DEBUG - run() no Registration record exists for *.mydomain.net ... creating
+ACMEDnsRegistrar - DEBUG - run() POSTed registration @ http://auth.mydomain.net/register for *.mydomain.net OK
+ACMEDnsRegistrar - DEBUG - run() local Registration record PUT OK in local RegistrationStore for *.mydomain.net target: f0ab4cfa-5976-49df-9e06-22c919891ad5.auth.mydomain.net
+```
+
+Next we do (#3), update the registration credentials in the [ACMEDNS solver in cert-manager](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns)
+```
+AcmeDnsK8sSecretStore - DEBUG - put_acme_dns_registrations_k8s_secret_data() successfully PATCHed k8s secret of acme-dns registrations for cert-manager @ cert-manager:acme-dns:acme-dns.json
+```
+
+Now for (#4) we ensure the CNAME record exists in our dns provider:
+```
 DnsProviderProcessor - DEBUG - process_dns_registration_events() invoking ensure_cname_for_acme_dns() -> azuredns
-ACMEDnsRegistrar - DEBUG - run() new Registration record created OK for my-service.int.mydomain.net target: 51b2f5b3-3632-45bd-9f2d-4fb9e0d56bfa.auth.mydomain.net
-BaseAzureDnsProvider azuredns - DEBUG - ensure_cname_for_acme_dns() azuredns processed *.int.mydomain.net (_acme-challenge.int) -> 66dbc160-2952-40f0-8a76-013423cfc9aa.auth.mydomain.net
-DnsProviderProcessor - DEBUG - process_dns_registration_events() successfully completed for: azuredns
-DnsProviderProcessor - DEBUG - process_dns_registration_events() invoking ensure_cname_for_acme_dns() -> azuredns
-BaseAzureDnsProvider azuredns - DEBUG - ensure_cname_for_acme_dns() azuredns processed my-service.int.mydomain.net (_acme-challenge.my-service.int) -> 51b2f5b3-3632-45bd-9f2d-4fb9e0d56bfa.auth.mydomain.net
+BaseAzureDnsProvider azuredns - DEBUG - ensure_cname_for_acme_dns() azuredns processed *.mydomain.net (_acme-challenge) -> f0ab4cfa-5976-49df-9e06-22c919891ad5.auth.mydomain.net
 DnsProviderProcessor - DEBUG - process_dns_registration_events() successfully completed for: azuredns
 ```
+
+At this point `cert-manager`, `acme-dns` and `lets-encrypt` take over for items #5, #6, #7, and #8 above in the diagram. It might take a minute or so but it saves a lot of manual work.
 
 ## review the ACMEDNS cert-manager acme-dns.json secret data
 
