@@ -56,7 +56,7 @@ helm upgrade \
 
 ## 5. Seed the acme-dns.json k8s secret
 
-Our goal here is to configure a [cert-manager [Cluster]Issuer](https://cert-manager.io/docs/configuration/acme/#creating-a-basic-acme-issuer) for `lets-encrypt` using a [DNS01 solver](https://cert-manager.io/docs/configuration/acme/dns01/) using [ACMEDNS challenge provider](https://cert-manager.io/docs/configuration/acme/dns01/)....but in order to do that we need a pre-requisite to be done... configure the `acme-dns.json` secret that will contain all the `acme-dns` registrations.
+Our goal here is to configure a [cert-manager [Cluster]Issuer](https://cert-manager.io/docs/configuration/acme/#creating-a-basic-acme-issuer) for `lets-encrypt` using a [DNS01 solver](https://cert-manager.io/docs/configuration/acme/dns01/) using [ACMEDNS challenge provider](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/)....but in order to do that we need a pre-requisite to be done... configure the `acme-dns.json` secret that will contain all the `acme-dns` registrations.
 
 Lets provision this secret into the cluster. Note the `acme-dns.json` contents are intentionally empty... why? because [kubernetes-acme-dns-registrar](https://github.com/bitsofinfo/kubernetes-acme-dns-registrar) will be automatically populating this for you.
 
