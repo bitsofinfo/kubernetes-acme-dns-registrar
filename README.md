@@ -1,13 +1,15 @@
 # kubernetes-acme-dns-registrar <!-- omit in TOC -->
 
-Watches k8s resources (ingress objects etc) to trigger acme-dns registrations and CNAME record creation in various DNS providers. 
+Watches k8s resources (ingress objects etc) to trigger automatic [acme-dns registrations](https://github.com/joohoi/acme-dns), [cert-manager ACMEDNS solver secret updates](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) and finally the required subdomain CNAME record creation across various DNS providers. 
 
-This project attempts to address the manual steps as described here in the [cert-manager dns01 acmd-dns solver documentation](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) by fully automating the following steps:
+This project attempts to address the manual steps as described here in the [cert-manager dns01 acme-dns solver documentation](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) by fully automating the following steps:
 
-* [acme-dns registaration](https://github.com/joohoi/acme-dns)
+* [acme-dns registration](https://github.com/joohoi/acme-dns)
 * dns provider CNAME creation
 * `acme-dns.json` secret update
 
+## table of contents <!-- omit in TOC -->
+- [overview](#overview)
 - [local dev](#local-dev)
 - [k8swatcher lib dev install](#k8swatcher-lib-dev-install)
 - [local run](#local-run)
@@ -20,6 +22,10 @@ This project attempts to address the manual steps as described here in the [cert
   - [API](#api)
   - [related projects](#related-projects)
   - [TODO](#todo)
+
+# overview
+
+This project provides some additional automation to help make your life easier when using the **awesome** [acme-dns DNS challenge server](https://github.com/joohoi/acme-dns). The diagram below shows a sample architecture where this project can be utilized to automated the typically manual [acme-dns registration](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) steps that one must take per-domain prior to having [cert-manager](https://cert-manager.io/) do its work.
 
 ![](docs/diag1.svg)
 # local dev
