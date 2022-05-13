@@ -1,5 +1,5 @@
 
-from typing import List
+from typing import List, Dict, Optional
 from abc import ABC, abstractmethod
 from queue import Queue
 from k8swatcher import K8sTrackedObject, K8sWatchEvent, K8sEventHandler
@@ -9,9 +9,11 @@ from .models import *
 from .settings import SmartSettings
 
 class K8sSettings(SmartSettings):
-    KADR_K8S_CONFIG_FILE_PATH:Optional[str]
-    KADR_K8S_CONTEXT_NAME:Optional[str]
+    KADR_K8S_WATCHER_CONFIG_FILE_PATH:Optional[str]
+    KADR_K8S_WATCHER_CONTEXT_NAME:Optional[str]
 
+    KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH:Optional[str]
+    KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME:Optional[str]
 class K8sKindHostExtractor(ABC):
     
     @abstractmethod
@@ -53,4 +55,3 @@ class DomainNameEventCreator(K8sEventHandler):
 
         except Exception as e:
             self.logger.exception(f"DomainNameEventCreator().handle_k8s_watch_event() unexpected error: {str(sys.exc_info()[:2])}")
-

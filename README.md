@@ -1,11 +1,18 @@
 # kubernetes-acme-dns-registrar <!-- omit in TOC -->
 
-Watches k8s resources (ingress objects etc) to trigger acme-dns registrations and CNAME record creation in various DNS providers
+Watches k8s resources (ingress objects etc) to trigger acme-dns registrations and CNAME record creation in various DNS providers. 
+
+This project attempts to address the manual steps as described here in the [cert-manager dns01 acmd-dns solver documentation](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) by fully automating the following steps:
+
+* [acme-dns registaration](https://github.com/joohoi/acme-dns)
+* dns provider CNAME creation
+* `acme-dns.json` secret update
 
 - [local dev](#local-dev)
 - [k8swatcher lib dev install](#k8swatcher-lib-dev-install)
 - [local run](#local-run)
   - [example output](#example-output)
+  - [review the ACMEDNS cert-manager acme-dns.json secret data](#review-the-acmedns-cert-manager-acme-dnsjson-secret-data)
 - [Docker](#docker)
   - [Docker Build:](#docker-build)
   - [Docker Run manual:](#docker-run-manual)
@@ -71,6 +78,13 @@ BaseAzureDnsProvider azuredns - DEBUG - ensure_cname_for_acme_dns() azuredns pro
 DnsProviderProcessor - DEBUG - process_dns_registration_events() successfully completed for: azuredns
 ```
 
+## review the ACMEDNS cert-manager acme-dns.json secret data
+
+the `Registrar` automatically manages the ACMEDNS secret that contains all registrations. You can quickly validate its contents; i.e.:
+
+```
+kubectl get secret acme-dns -n cert-manager -o json | jq -r '.data."acme-dns.json"' | base64 --decode | jq
+```
 # Docker
 ## Docker Build:
 
@@ -95,8 +109,10 @@ docker run \
     -e KADR_DNS_PROVIDER_CONFIG_YAML=file@/opt/scripts/dns-provider-config.yaml \
     -e KADR_DNS_PROVIDER_SECRETS_YAML=file@/opt/scripts/dns-provider-secrets.yaml \
     -e KADR_JWT_SECRET_KEY=123 \
-    -e KADR_K8S_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
-    -e KADR_K8S_CONTEXT_NAME=my-k8s-contedxt \
+    -e KADR_K8S_WATCHER_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
+    -e KADR_K8S_WATCHER_CONTEXT_NAME=my-k8s-context \
+    -e KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
+    -e KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME=my-k8s-context
         \
     kubernetes-acme-dns-registrar:0.0.1
 ```

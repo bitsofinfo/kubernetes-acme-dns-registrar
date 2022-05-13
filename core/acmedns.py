@@ -11,6 +11,9 @@ import re
 from re import Pattern
 from .settings import SmartSettings
 from .utils import *
+from typing import Dict
+from .store import AcmeDnsK8sSecretStore
+import asyncio
 
 class ACMEDnsSettings(SmartSettings):
     KADR_ACME_DNS_CONFIG_YAML:str
@@ -29,6 +32,8 @@ class ACMEDnsRegistrar(Thread):
         self.domain_name_event_queue = domain_name_event_queue
         self.acme_dns_registration_queue = acme_dns_registration_queue
 
+        self.acme_dns_k8s_secret_store = AcmeDnsK8sSecretStore()
+
         self.init_configs()
 
     def init_configs(self):
@@ -43,7 +48,15 @@ class ACMEDnsRegistrar(Thread):
     def get_zone_config(self, domain_name):
         return find_config(self.zone_configs, domain_name)
 
-    def run(self):
+    async def patch_k8s_secret(self):
+        all_acme_dns_registrations:Dict[str,Registration] = await self.registration_store.get_all()
+        acme_dns_registration_secret_data = {}
+        for name,reg in all_acme_dns_registrations.items():
+            acme_dns_registration_secret_data[name] = reg.acme_dns_registration.dict()
+
+        await self.acme_dns_k8s_secret_store.put_acme_dns_registrations_k8s_secret_data(acme_dns_registration_secret_data)
+
+    async def do_processing(self):
         try:
            while True:
                 domain_name_event:DomainNameEvent = self.domain_name_event_queue.get()
@@ -79,9 +92,10 @@ class ACMEDnsRegistrar(Thread):
                     acme_dns_registration:AcmeDnsRegistration = \
                             AcmeDnsRegistration(**acme_dns_registration_response.json())
 
-                    # make this configurable
-                    acme_dns_registration.username = "REMOVED"
-                    acme_dns_registration.password = "REMOVED"
+                    # make this configurable 
+                    # (i.e. don't always store the credential in the RegistrationStore)
+                    #acme_dns_registration.username = "REMOVED"
+                    #acme_dns_registration.password = "REMOVED"
 
                     registration = Registration(**{
                         "created_at": datetime.utcnow(),
@@ -100,12 +114,14 @@ class ACMEDnsRegistrar(Thread):
                         "source_domain_name_event": domain_name_event
                     })
 
-
-
                 self.registration_store.put_registration(registration)
 
                 self.logger.debug(f"run() local Registration record PUT OK in local RegistrationStore for {domain_name_event.domain_name} target: {acme_dns_registration.fulldomain}")
 
+                # update secret w/ all latest registrations
+                await self.patch_k8s_secret()
+
+                # fire event
                 acme_dns_register_event:AcmeDnsRegistationEvent = \
                         AcmeDnsRegistationEvent(registration=registration)
 
@@ -113,3 +129,7 @@ class ACMEDnsRegistrar(Thread):
             
         except Exception as e : 
             self.logger.exception(f"ACMEDnsRegistrar().run() unexpected error: {str(sys.exc_info()[:2])}")
+
+
+    def run(self):
+        asyncio.run(self.do_processing())

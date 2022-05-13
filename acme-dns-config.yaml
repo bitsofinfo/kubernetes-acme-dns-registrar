@@ -1,3 +1,9 @@
+acme-dns-solver:
+  account_secret_ref:
+    name: acme-dns
+    key: acme-dns.json
+    namespace: cert-manager
+
 zone_configs:
   my-domain.net:
     includes:
