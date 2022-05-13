@@ -9,8 +9,10 @@ This project attempts to address the manual steps as described here in the [cert
 * `acme-dns.json` secret update
 
 ## table of contents <!-- omit in TOC -->
+- [features](#features)
 - [overview](#overview)
     - [example output](#example-output)
+  - [overview of overall setup](#overview-of-overall-setup)
 - [local dev](#local-dev)
 - [k8swatcher lib dev install](#k8swatcher-lib-dev-install)
 - [local run](#local-run)
@@ -23,6 +25,14 @@ This project attempts to address the manual steps as described here in the [cert
   - [related projects](#related-projects)
   - [TODO](#todo)
 
+# features
+
+* extensible to support any kubernetes `kind` trigger (currently `Ingress` `tls.hosts[]` supported)
+* automatic [acme-dns challenge server registration](https://github.com/joohoi/acme-dns) 
+* automatic updates to the [cert-manager acme-dns solver secret i.e. acme-dns.json](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) 
+* automatic [dnsprovider](core/dnsprovider) CNAME creation
+* works with wildcards
+* works with private dns scenarios
 # overview
 
 This project provides some additional automation to help make your life easier when using the **awesome** [acme-dns DNS challenge server](https://github.com/joohoi/acme-dns). The diagram below shows a sample architecture where this project can be utilized to automate the typically manual [acme-dns registration](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) steps that one must take per-domain prior to having [cert-manager](https://cert-manager.io/) do its work. 
@@ -75,6 +85,17 @@ DnsProviderProcessor - DEBUG - process_dns_registration_events() successfully co
 ```
 
 At this point `cert-manager`, `acme-dns` and `lets-encrypt` take over for items #5, #6, #7, and #8 above in the diagram. It might take a minute or so but it saves a lot of manual work.
+
+## overview of overall setup
+
+1. setup an and configure [acme-dns](https://github.com/joohoi/acme-dns) instance
+1. install cert-manager
+   1. create an `acme-dns` secret w/ an empty set of `acme-dns.json` registrations
+   2. configure a `[Cluster]Issuer` w/ a `DNS01` solver of type `acmeDNS` pointing to the [acme-dns](https://github.com/joohoi/acme-dns) instance you set up in step 1 and referencing the secret above
+1. install and configure `kubernetes-acme-dns-registrar`
+
+
+2. 
 # local dev
 
 ```
