@@ -62,7 +62,7 @@ class AcmeDnsK8sSecretStore():
 
         # load the secret-meta-data location information
         acme_dns_config = self.settings.get_from_yaml("KADR_ACME_DNS_CONFIG_YAML")
-        print(acme_dns_config)
+
         acme_dns_solver_config = acme_dns_config["acme-dns-solver"]
         self.secret_ref_name = acme_dns_solver_config["account_secret_ref"]["name"]
         self.secret_ref_key = acme_dns_solver_config["account_secret_ref"]["key"]
