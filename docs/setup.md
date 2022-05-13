@@ -79,7 +79,7 @@ stringData:
 
 Next we need to configure a [cert-manager [Cluster]Issuer](https://cert-manager.io/docs/configuration/acme/#creating-a-basic-acme-issuer) for `lets-encrypt`
 
-Here is a sample of what this looks like for `lets-encrypt` STAGING (which is what you will want to start with). 
+Here is a sample of what this looks like for `lets-encrypt` STAGING (which is what you will want to start with). This configuration is basically telling `cert-manager` *"here is where you go to write ACME challenges TXT records, and this acme-dns.json contains the credentials you will need to do the writes..."*
 
 Note the `acmeDNS` section and `accountSecretRef` below.
 
