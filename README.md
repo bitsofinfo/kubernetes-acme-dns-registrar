@@ -14,7 +14,6 @@ This project attempts to address the manual steps as described here in the [cert
     - [example output](#example-output)
   - [overview of overall setup](#overview-of-overall-setup)
 - [local dev](#local-dev)
-- [k8swatcher lib dev install](#k8swatcher-lib-dev-install)
 - [local run](#local-run)
   - [review the ACMEDNS cert-manager acme-dns.json secret data](#review-the-acmedns-cert-manager-acme-dnsjson-secret-data)
 - [Docker](#docker)
@@ -24,6 +23,7 @@ This project attempts to address the manual steps as described here in the [cert
   - [API](#api)
   - [related projects](#related-projects)
   - [TODO](#todo)
+- [k8swatcher lib dev install](#k8swatcher-lib-dev-install)
 
 # features
 
@@ -33,6 +33,7 @@ This project attempts to address the manual steps as described here in the [cert
 * automatic [dnsprovider](core/dnsprovider) CNAME creation
 * works with wildcards
 * works with private dns scenarios
+* simple API for reviewing database of `Registrations`
 # overview
 
 This project provides some additional automation to help make your life easier when using the **awesome** [acme-dns DNS challenge server](https://github.com/joohoi/acme-dns). The diagram below shows a sample architecture where this project can be utilized to automate the typically manual [acme-dns registration](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) steps that one must take per-domain prior to having [cert-manager](https://cert-manager.io/) do its work. 
@@ -104,16 +105,6 @@ source kubernetes-acme-dns-registrar.ve/bin/activate
 pip install -r requirements-dev.txt
 ```
 
-
-# k8swatcher lib dev install
-
-```
- pip install     \
-    --index-url https://test.pypi.org/simple/     \
-    --extra-index-url https://pypi.org/simple/     \
-    k8swatcher==0.0.0.20220509142406
-```
-
 # local run
 
 ```
@@ -123,6 +114,11 @@ KADR_ACME_DNS_CONFIG_YAML=file@`pwd`/dev.acme-dns-config.yaml \
 KADR_DNS_PROVIDER_CONFIG_YAML=file@`pwd`/dev.dns-provider-config.yaml \
 KADR_DNS_PROVIDER_SECRETS_YAML=file@`pwd`/dev.dns-provider-secrets.yaml \
 KADR_JWT_SECRET_KEY=123 \
+KADR_K8S_WATCHER_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
+KADR_K8S_WATCHER_CONTEXT_NAME=my-k8s-context \
+KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
+KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME=my-k8s-context \
+    \
  uvicorn main:app --reload
 ```
 
@@ -185,9 +181,6 @@ docker run \
         \
     kubernetes-acme-dns-registrar:0.0.1
 ```
-
-
-
 ## API
 
 Once you start up the registrar, you can access the following endpoints:
@@ -205,4 +198,13 @@ https://github.com/bitsofinfo/k8swatcher
 
 ## TODO
 
-* update acme-dns solver secret w/ registrations
+* more robust implementation of `RegistrationStore` (i.e. sqllite etc)
+
+# k8swatcher lib dev install
+
+```
+ pip install     \
+    --index-url https://test.pypi.org/simple/     \
+    --extra-index-url https://pypi.org/simple/     \
+    k8swatcher==0.0.0.20220509142406
+```
