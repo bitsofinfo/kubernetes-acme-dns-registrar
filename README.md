@@ -10,10 +10,10 @@ This project attempts to address the manual steps as described here in the [cert
 
 ## table of contents <!-- omit in TOC -->
 - [overview](#overview)
+    - [example output](#example-output)
 - [local dev](#local-dev)
 - [k8swatcher lib dev install](#k8swatcher-lib-dev-install)
 - [local run](#local-run)
-  - [example output](#example-output)
   - [review the ACMEDNS cert-manager acme-dns.json secret data](#review-the-acmedns-cert-manager-acme-dnsjson-secret-data)
 - [Docker](#docker)
   - [Docker Build:](#docker-build)
@@ -30,37 +30,8 @@ This project provides some additional automation to help make your life easier w
 *note, the `load-balancers`, `Ingress/Controllers`, `external-dns` and `dns server` componments in this diagram are just here as an example architecture. They key function of `kubernetes-acme-dns-registrar` is listening for kubernetes events, to drive the automation of `cert-manager` based TLS certificate issuance via `acme-dns`. Currently watching `Ingress` objects is supported, but PRs are welcome to add support for watching any other kubernetes `kinds`!*
 
 ![](docs/diag1.svg)
-# local dev
 
-```
-python3 -m venv kubernetes-acme-dns-registrar.ve
-source kubernetes-acme-dns-registrar.ve/bin/activate
-pip install -r requirements-dev.txt
-```
-
-
-# k8swatcher lib dev install
-
-```
- pip install     \
-    --index-url https://test.pypi.org/simple/     \
-    --extra-index-url https://pypi.org/simple/     \
-    k8swatcher==0.0.0.20220509142406
-```
-
-# local run
-
-```
-
-KADR_K8S_WATCHER_CONFIG_YAML=file@`pwd`/dev.k8s-watcher-config.yaml \
-KADR_ACME_DNS_CONFIG_YAML=file@`pwd`/dev.acme-dns-config.yaml \
-KADR_DNS_PROVIDER_CONFIG_YAML=file@`pwd`/dev.dns-provider-config.yaml \
-KADR_DNS_PROVIDER_SECRETS_YAML=file@`pwd`/dev.dns-provider-secrets.yaml \
-KADR_JWT_SECRET_KEY=123 \
- uvicorn main:app --reload
-```
-
-## example output
+### example output
 
 Here are some example logs showing what this does, here we are detecting 2 new domain names from the `tls.hosts` section of an `Ingress` object that gets deployed on kubernetes. We react by creating a new registration in `acme-dns`, saving the meta-data to our local storage, updating the `acme-dns` kubernetes secret and then use the `azuredns` provider to automatically create the `CNAME` pointer to the `acme-dns` subdomin so that that `cert-manager` can fulfill the negotiation w/ `lets-encrypt` to issue the certificate for the `Ingress'`
 
@@ -104,6 +75,37 @@ DnsProviderProcessor - DEBUG - process_dns_registration_events() successfully co
 ```
 
 At this point `cert-manager`, `acme-dns` and `lets-encrypt` take over for items #5, #6, #7, and #8 above in the diagram. It might take a minute or so but it saves a lot of manual work.
+# local dev
+
+```
+python3 -m venv kubernetes-acme-dns-registrar.ve
+source kubernetes-acme-dns-registrar.ve/bin/activate
+pip install -r requirements-dev.txt
+```
+
+
+# k8swatcher lib dev install
+
+```
+ pip install     \
+    --index-url https://test.pypi.org/simple/     \
+    --extra-index-url https://pypi.org/simple/     \
+    k8swatcher==0.0.0.20220509142406
+```
+
+# local run
+
+```
+
+KADR_K8S_WATCHER_CONFIG_YAML=file@`pwd`/dev.k8s-watcher-config.yaml \
+KADR_ACME_DNS_CONFIG_YAML=file@`pwd`/dev.acme-dns-config.yaml \
+KADR_DNS_PROVIDER_CONFIG_YAML=file@`pwd`/dev.dns-provider-config.yaml \
+KADR_DNS_PROVIDER_SECRETS_YAML=file@`pwd`/dev.dns-provider-secrets.yaml \
+KADR_JWT_SECRET_KEY=123 \
+ uvicorn main:app --reload
+```
+
+
 
 ## review the ACMEDNS cert-manager acme-dns.json secret data
 
