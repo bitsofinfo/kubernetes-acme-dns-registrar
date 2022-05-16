@@ -15,7 +15,8 @@ This project attempts to address the manual steps as described here in the [cert
 - [setup](#setup)
   - [overview of overall setup](#overview-of-overall-setup)
   - [configuration](#configuration)
-    - [ENV variables](#env-variables)
+    - [core ENV variables](#core-env-variables)
+    - [fastapi uvicorn ENV vars](#fastapi-uvicorn-env-vars)
 - [docker](#docker)
   - [Docker Build:](#docker-build)
   - [Docker Run manual:](#docker-run-manual)
@@ -104,7 +105,7 @@ Please check-out [docs/setup](docs/setup.md)
 The entire application is configurable via several `ENVIRONMENT` variables. The set values of ENV variables can be either string literals or also file path references (i.e. referencing a mounted kubernetes `config-map` or `secret` etc). To utilize simply set your ENV variable value to `ENV_VAR=file@/path/to/file`
 
 See [settings.py](core/settings.py) for more info (which is based off of [pydantic's settings](https://pydantic-docs.helpmanual.io/usage/settings/)
-### ENV variables
+### core ENV variables
 
 * `KADR_K8S_WATCHER_CONFIG_YAML`: YAML string literal config or file reference: `file@/path/to/k8s-watcher-config.yaml` This is the YAML configuration that drives the behavior of the underlying [k8swatcher](https://github.com/bitsofinfo/k8swatcher) and which kubernetes events ultimately will trigger everything. See the [k8s-watcher-config.yaml example config file](k8s-watcher-config.yaml)
 
@@ -127,6 +128,16 @@ See [settings.py](core/settings.py) for more info (which is based off of [pydant
 * `KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME`: the kubernetes context name expected to be found in `KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH`. This is the k8s context that the underlying [AcmeDnsK8sSecretStore](core/store.py) will use to connect to kubernetes to manage the `acme-dns.json` secret used by `cert-manager`
 
 
+### fastapi uvicorn ENV vars
+
+This app executes as a [FastAPI](https://fastapi.tiangolo.com/) app, which is run within [uvicorn](https://www.uvicorn.org/), this is mainly to support the healthchecks and basic API it presents. The following ENV vars control some aspects of `uvicorn` and are consumed by [docker_resources/entrypoint.sh](docker_resources/entrypoint.sh)
+
+`UVICORN_ARG_SSL_KEYFILE`: path to TLS key file, default none
+`UVICORN_ARG_SSL_CERTFILE`: path to TLS certificate file, default none
+`UVICORN_ARG_WORKERS`: number of workers, default `1`
+`UVICORN_ARG_HOST`: host to bind to, default `0.0.0.0`
+`UVICORN_ARG_PORT`: port to listen on, default `8000`
+`UVICORN_ARG_APP`: the app to launch, default`main:app`
 # docker
 
 The official image is at: https://hub.docker.com/repository/docker/bitsofinfo/kubernetes-acme-dns-registrar
