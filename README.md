@@ -132,12 +132,12 @@ See [settings.py](core/settings.py) for more info (which is based off of [pydant
 
 This app executes as a [FastAPI](https://fastapi.tiangolo.com/) app, which is run within [uvicorn](https://www.uvicorn.org/), this is mainly to support the healthchecks and basic API it presents. The following ENV vars control some aspects of `uvicorn` and are consumed by [docker_resources/entrypoint.sh](docker_resources/entrypoint.sh)
 
-`UVICORN_ARG_SSL_KEYFILE`: path to TLS key file, default none
-`UVICORN_ARG_SSL_CERTFILE`: path to TLS certificate file, default none
-`UVICORN_ARG_WORKERS`: number of workers, default `1`
-`UVICORN_ARG_HOST`: host to bind to, default `0.0.0.0`
-`UVICORN_ARG_PORT`: port to listen on, default `8000`
-`UVICORN_ARG_APP`: the app to launch, default`main:app`
+* `UVICORN_ARG_SSL_KEYFILE`: path to TLS key file, default none
+* `UVICORN_ARG_SSL_CERTFILE`: path to TLS certificate file, default none
+* `UVICORN_ARG_WORKERS`: number of workers, default `1`
+* `UVICORN_ARG_HOST`: host to bind to, default `0.0.0.0`
+* `UVICORN_ARG_PORT`: port to listen on, default `8000`
+* `UVICORN_ARG_APP`: the app to launch, default`main:app`
 # docker
 
 The official image is at: https://hub.docker.com/repository/docker/bitsofinfo/kubernetes-acme-dns-registrar
