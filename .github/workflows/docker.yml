@@ -23,7 +23,7 @@ jobs:
           pip install --upgrade dunamai setuptools setuptools_scm wheel twine
           export VERSION_NUMBER=$(dunamai from git --format dev-0.0.0.{timestamp})
           echo "VERSION_NUMBER: $VERSION_NUMBER"
-          echo "::set-env name=VERSION_NUMBER::$VERSION_NUMBER"
+          echo "VERSION_NUMBER=$VERSION_NUMBER" >> $GITHUB_ENV
 
       - name: Dev Build and push
         if: startsWith(github.ref, 'refs/tags') == false
