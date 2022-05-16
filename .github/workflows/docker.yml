@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -34,4 +34,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kubernetes-acme-dns-registrar:$VERSION_NUMBER
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kubernetes-acme-dns-registrar:${{ env.VERSION_NUMBER }}
