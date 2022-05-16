@@ -103,7 +103,7 @@ Please check-out [docs/setup](docs/setup.md)
 
 The entire application is configurable via several `ENVIRONMENT` variables. The set values of ENV variables can be either string literals or also file path references (i.e. referencing a mounted kubernetes `config-map` or `secret` etc). To utilize simply set your ENV variable value to `ENV_VAR=file@/path/to/file`
 
-See [settings.py](core/settings.py) for more info (which is based off of [pydatic's settings](https://pydantic-docs.helpmanual.io/usage/settings/)
+See [settings.py](core/settings.py) for more info (which is based off of [pydantic's settings](https://pydantic-docs.helpmanual.io/usage/settings/)
 ### ENV variables
 
 * `KADR_K8S_WATCHER_CONFIG_YAML`: YAML string literal config or file reference: `file@/path/to/k8s-watcher-config.yaml` This is the YAML configuration that drives the behavior of the underlying [k8swatcher](https://github.com/bitsofinfo/k8swatcher) and which kubernetes events ultimately will trigger everything. See the [k8s-watcher-config.yaml example config file](k8s-watcher-config.yaml)
