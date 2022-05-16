@@ -12,6 +12,8 @@
 # dnsproviders are responsible for managing the CNAME records for the 
 # acme-dns challenge server for each fqdn in a zone that is detected
 # by the underlying watcher and subsequent acme-dns registration
+#
+# the contents of this file is merged with dns-provider-secrets.yaml
 #---------------------------------------------------------------------------
 
 dns_providers:

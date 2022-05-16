@@ -12,17 +12,19 @@ This project attempts to address the manual steps as described here in the [cert
 - [features](#features)
 - [overview](#overview)
     - [example output](#example-output)
+- [setup](#setup)
   - [overview of overall setup](#overview-of-overall-setup)
-- [local dev](#local-dev)
-- [local run](#local-run)
-  - [review the ACMEDNS cert-manager acme-dns.json secret data](#review-the-acmedns-cert-manager-acme-dnsjson-secret-data)
-- [Docker](#docker)
+- [docker](#docker)
   - [Docker Build:](#docker-build)
   - [Docker Run manual:](#docker-run-manual)
   - [Docker Run with .env file:](#docker-run-with-env-file)
-  - [API](#api)
-  - [related projects](#related-projects)
-  - [TODO](#todo)
+- [API](#api)
+- [local dev](#local-dev)
+  - [local run](#local-run)
+- [troubleshooting](#troubleshooting)
+  - [review the ACMEDNS cert-manager acme-dns.json secret data](#review-the-acmedns-cert-manager-acme-dnsjson-secret-data)
+- [related projects](#related-projects)
+- [TODO](#todo)
 - [k8swatcher lib dev install](#k8swatcher-lib-dev-install)
 
 # features
@@ -87,46 +89,15 @@ DnsProviderProcessor - DEBUG - process_dns_registration_events() successfully co
 
 At this point `cert-manager`, `acme-dns` and `lets-encrypt` take over for items #5, #6, #7, and #8 above in the diagram. It might take a minute or so but it saves a lot of manual work.
 
+# setup
+
 ## overview of overall setup
 
 Trying to figure out an entire dynamic tls certificate solution in kubernetes can be daunting. [This guide(docs/setup.md) will try to point you in the right direction by laying out the general guideposts and order of operations. 
 
 Please check-out [docs/setup](docs/setup.md)
-# local dev
 
-```
-python3 -m venv kubernetes-acme-dns-registrar.ve
-source kubernetes-acme-dns-registrar.ve/bin/activate
-pip install -r requirements-dev.txt
-```
-
-# local run
-
-```
-
-KADR_K8S_WATCHER_CONFIG_YAML=file@`pwd`/dev.k8s-watcher-config.yaml \
-KADR_ACME_DNS_CONFIG_YAML=file@`pwd`/dev.acme-dns-config.yaml \
-KADR_DNS_PROVIDER_CONFIG_YAML=file@`pwd`/dev.dns-provider-config.yaml \
-KADR_DNS_PROVIDER_SECRETS_YAML=file@`pwd`/dev.dns-provider-secrets.yaml \
-KADR_JWT_SECRET_KEY=123 \
-KADR_K8S_WATCHER_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
-KADR_K8S_WATCHER_CONTEXT_NAME=my-k8s-context \
-KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
-KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME=my-k8s-context \
-    \
- uvicorn main:app --reload
-```
-
-
-
-## review the ACMEDNS cert-manager acme-dns.json secret data
-
-the `Registrar` automatically manages the ACMEDNS secret that contains all registrations. You can quickly validate its contents; i.e.:
-
-```
-kubectl get secret acme-dns -n cert-manager -o json | jq -r '.data."acme-dns.json"' | base64 --decode | jq
-```
-# Docker
+# docker
 ## Docker Build:
 
 The [Dockerfile](Dockerfile) can be built with the following command:
@@ -176,22 +147,55 @@ docker run \
         \
     kubernetes-acme-dns-registrar:0.0.1
 ```
-## API
+# API
 
 Once you start up the registrar, you can access the following endpoints:
+
+http://localhost:8000/docs
 
 * `GET /health` - FastAPI healthcheck endpoint
 * `GET /docs` - FastAPI swagger docs
 * `POST /oauth2/token` - Acquire an OAuth2 `client_credentials` grant token (username/pw basic auth OR via `client_id/client_secret` FORM post params)
 * `GET /registrations[/{name}]` - View the registrar's `Registration` database records
 
-## related projects
+# local dev
+
+```
+python3 -m venv kubernetes-acme-dns-registrar.ve
+source kubernetes-acme-dns-registrar.ve/bin/activate
+pip install -r requirements-dev.txt
+```
+
+## local run
+
+```bash
+KADR_K8S_WATCHER_CONFIG_YAML=file@`pwd`/dev.k8s-watcher-config.yaml \
+KADR_ACME_DNS_CONFIG_YAML=file@`pwd`/dev.acme-dns-config.yaml \
+KADR_DNS_PROVIDER_CONFIG_YAML=file@`pwd`/dev.dns-provider-config.yaml \
+KADR_DNS_PROVIDER_SECRETS_YAML=file@`pwd`/dev.dns-provider-secrets.yaml \
+KADR_JWT_SECRET_KEY=123 \
+KADR_K8S_WATCHER_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
+KADR_K8S_WATCHER_CONTEXT_NAME=my-k8s-context \
+KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
+KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME=my-k8s-context \
+    \
+ uvicorn main:app --reload
+```
+# troubleshooting
+## review the ACMEDNS cert-manager acme-dns.json secret data
+
+the `Registrar` automatically [manages the ACMEDNS `cert-manager` secret](https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/) that contains all registrations. You can quickly validate its contents; i.e.:
+
+```
+kubectl get secret acme-dns -n cert-manager -o json | jq -r '.data."acme-dns.json"' | base64 --decode | jq
+```
+# related projects
 
 https://github.com/joohoi/acme-dns  
 
 https://github.com/bitsofinfo/k8swatcher
 
-## TODO
+# TODO
 
 * more robust implementation of `RegistrationStore` (i.e. sqllite etc)
 * configuration of `k8s.py` `K8sKindHostExtractor's` per watcher config, currently assumed Ingress
