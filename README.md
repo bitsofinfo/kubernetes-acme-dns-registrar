@@ -98,6 +98,8 @@ Trying to figure out an entire dynamic tls certificate solution in kubernetes ca
 Please check-out [docs/setup](docs/setup.md)
 
 # docker
+
+The official repo is at: https://hub.docker.com/repository/docker/bitsofinfo/kubernetes-acme-dns-registrar
 ## Docker Build:
 
 The [Dockerfile](Dockerfile) can be built locally with the following command:
