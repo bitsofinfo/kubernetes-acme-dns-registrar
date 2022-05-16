@@ -1,23 +1,43 @@
+
+#---------------------------------------------------------------------------
+# Configuration for supported dnsproviders:
+# https://github.com/bitsofinfo/kubernetes-acme-dns-registrar/tree/main/core/dnsprovider
+#
+# dnsproviders are responsible for managing the CNAME records for the 
+# acme-dns challenge server for each fqdn in a zone that is detected
+# by the underlying watcher and subsequent acme-dns registration
+#---------------------------------------------------------------------------
+
 dns_providers:
 
+  # example for azuredns
   azuredns:
 
-    # common settings
+    # common settings, can be overriden per zone below
     subscription_id: xxx
     tenant_id: yyy
     client_id: zzz
 
     zones:
 
+      # zones that we will manage CNAME records in
       my-domain.net:
         resource_group_name: some-rg,
         zone_name: my-domain.net
         ttl: 300
+
+        # only manage dns CNAMEs for 
+        # AcmeDnsRegistationEvent.Registration.cname_name 
+        # that matches the following patterns (ANY match)
         includes: 
           - ".+\\.my-domain\\.net"
-        excludes": null,
 
-        # optional can override settings here per zone
+        # ignore/exclude dns CNAMEs management for 
+        # AcmeDnsRegistationEvent.Registration.cname_name
+        # that matches the following patterns (ANY match)
+        excludes: null,
+
+        # optional can override the top level settings here per zone
         #subscription_id: xxx
         #tenant_id: yyy
         #client_id: zzz

@@ -1,12 +1,34 @@
+
+#---------------------------------------------------------------------------
+# https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/
+# This should reference the SAME secret that cert-manager's
+# ACME solver dns01.acmeDNS does in your cert-manager configuration
+#
+# The secret and acme-dns.json below will be 
+# updated by kubernetes-acme-dns-registrar with new registrations
+#---------------------------------------------------------------------------
 acme-dns-solver:
   account_secret_ref:
     name: acme-dns
     key: acme-dns.json
     namespace: cert-manager
 
+
+#---------------------------------------------------------------------------
+# List the zones that you want kubernetes-acme-dns-registrar to react
+# to when new k8s events are receieved. Only zones listed below who's
+# includes/excludes patterns match the DomainNameEvent.domain_name property
+# will be registered against acme-dns
+#---------------------------------------------------------------------------
 zone_configs:
   my-domain.net:
+
     includes:
       - .+\.my-domain\.net
+
+    # list: any match will will exclude the event
+    # even if it matches an includes above
     excludes: null
+
+    # the acme-dns registration URL
     acme_dns_registration_url: http://auth.my-domain.net/register

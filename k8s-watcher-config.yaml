@@ -1,3 +1,10 @@
+#---------------------------------------------------------------------------
+# Configures the underlying k8swatcher for what k8s events it will
+# watch and create DomainNameEvents for that will lead acme-dns registrations
+#
+# @see https://github.com/bitsofinfo/k8swatcher
+#---------------------------------------------------------------------------
+
 k8s_watch_configs:
   - id: all_ingress_edg-apps
     namespace: my-apps
