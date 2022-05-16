@@ -1,3 +1,10 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The contents of this file or a pointer to this file should
+# be set to the ENV variable:
+#
+# KADR_ACME_DNS_CONFIG_YAML=[yaml | file@/path/reference]
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 #---------------------------------------------------------------------------
 # https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/

@@ -1,3 +1,10 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The contents of this file or a pointer to this file should
+# be set to the ENV variable:
+#
+# KADR_K8S_WATCHER_CONFIG_YAML=[yaml | file@/path/reference]
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #---------------------------------------------------------------------------
 # Configures the underlying k8swatcher for what k8s events it will
 # watch and create DomainNameEvents for that will lead acme-dns registrations

@@ -194,6 +194,7 @@ https://github.com/bitsofinfo/k8swatcher
 ## TODO
 
 * more robust implementation of `RegistrationStore` (i.e. sqllite etc)
+* configuration of `k8s.py` `K8sKindHostExtractor's` per watcher config, currently assumed Ingress
 
 # k8swatcher lib dev install
 

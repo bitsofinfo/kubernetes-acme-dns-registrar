@@ -1,3 +1,9 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The contents of this file or a pointer to this file should
+# be set to the ENV variable:
+#
+# KADR_DNS_PROVIDER_CONFIG_YAML=[yaml | file@/path/reference]
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #---------------------------------------------------------------------------
 # Configuration for supported dnsproviders:
