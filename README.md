@@ -99,7 +99,7 @@ Please check-out [docs/setup](docs/setup.md)
 
 # docker
 
-The official repo is at: https://hub.docker.com/repository/docker/bitsofinfo/kubernetes-acme-dns-registrar
+The official image is at: https://hub.docker.com/repository/docker/bitsofinfo/kubernetes-acme-dns-registrar
 ## Docker Build:
 
 The [Dockerfile](Dockerfile) can be built locally with the following command:
@@ -128,7 +128,7 @@ docker run \
     -e KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
     -e KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME=my-k8s-context \
         \
-    bitsofinfo/kubernetes-acme-dns-registrar:latest
+    bitsofinfo/kubernetes-acme-dns-registrar:dev-latest
 ```
 
 ## Docker Run with .env file:
@@ -145,9 +145,9 @@ docker run \
     -v `pwd`/dev.k8s-watcher-config.yaml:/opt/scripts/k8s-watcher-config.yaml \
     -v `pwd`/dev.acme-dns-config.yaml:/opt/scripts/acme-dns-config.yaml \
     -v `pwd`/dev.dns-provider-config.yaml:/opt/scripts/dns-provider-config.yaml \
-    -v `pwd`/dev.dns-provider-secrets.yaml:/opt/scripts/dns-provider-secrets.yaml\
+    -v `pwd`/dev.dns-provider-secrets.yaml:/opt/scripts/dns-provider-secrets.yaml \
         \
-    kubernetes-acme-dns-registrar:0.0.1
+    bitsofinfo/kubernetes-acme-dns-registrar:dev-latest
 ```
 # API
 
