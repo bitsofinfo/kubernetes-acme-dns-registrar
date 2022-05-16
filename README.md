@@ -14,6 +14,8 @@ This project attempts to address the manual steps as described here in the [cert
     - [example output](#example-output)
 - [setup](#setup)
   - [overview of overall setup](#overview-of-overall-setup)
+  - [configuration](#configuration)
+    - [ENV variables](#env-variables)
 - [docker](#docker)
   - [Docker Build:](#docker-build)
   - [Docker Run manual:](#docker-run-manual)
@@ -96,6 +98,34 @@ At this point `cert-manager`, `acme-dns` and `lets-encrypt` take over for items 
 Trying to figure out an entire dynamic tls certificate solution in kubernetes can be daunting. [This guide(docs/setup.md) will try to point you in the right direction by laying out the general guideposts and order of operations. 
 
 Please check-out [docs/setup](docs/setup.md)
+
+## configuration
+
+The entire application is configurable via several `ENVIRONMENT` variables. The set values of ENV variables can be either string literals or also file path references (i.e. referencing a mounted kubernetes `config-map` or `secret` etc). To utilize simply set your ENV variable value to `ENV_VAR=file@/path/to/file`
+
+See [settings.py](core/settings.py) for more info (which is based off of [pydatic's settings](https://pydantic-docs.helpmanual.io/usage/settings/)
+### ENV variables
+
+* `KADR_K8S_WATCHER_CONFIG_YAML`: YAML string literal config or file reference: `file@/path/to/k8s-watcher-config.yaml` This is the YAML configuration that drives the behavior of the underlying [k8swatcher](https://github.com/bitsofinfo/k8swatcher) and which kubernetes events ultimately will trigger everything. See the [k8s-watcher-config.yaml example config file](k8s-watcher-config.yaml)
+
+
+* `KADR_ACME_DNS_CONFIG_YAML`: YAML string literal config or file reference: `file@/path/to/acme-dns-config.yaml` This is the YAML configuration that drives the behavior [of the ACMEDnsRegistrar](core/acmedns.py) See the [acme-dns-config.yaml example config file](acme-dns-config.yaml)
+
+
+* `KADR_DNS_PROVIDER_CONFIG_YAML`: YAML string literal config or file reference: `file@/path/to/dns-provider-config.yaml` This is the YAML configuration that drives the behavior of the supported [dnsproviders you want to enable](core/dnsprovider) See the [dns-provider-config.yaml example config file](dns-provider-config.yaml)
+
+* `KADR_DNS_PROVIDER_SECRETS_YAML`: YAML string literal config or file reference: `file@/path/to/dns-provider-secrets.yaml` This is the YAML configuration that configures any secrets for the supported [dnsproviders you want to enable](core/dnsprovider) See the [dns-provider-secrets.yaml example config file](dns-provider-secrets.yaml)
+
+* `KADR_JWT_SECRET_KEY`: string literal config or file reference: `file@/path/to/jwtsecret`. This is the secret key (i.e. string password/value) that will be used by the underlying JWT token signing code that secures the API
+
+* `KADR_K8S_WATCHER_CONFIG_FILE_PATH`: File path to a kubernetes config file that defines the context your reference via `KADR_K8S_WATCHER_CONTEXT_NAME`. This is the k8s config that the underlying [k8swatcher](https://github.com/bitsofinfo/k8swatcher) will use to connect to kubernetes
+
+* `KADR_K8S_WATCHER_CONTEXT_NAME`: the kubernetes context name expected to be found in `KADR_K8S_WATCHER_CONFIG_FILE_PATH`. This is the k8s context that the underlying [k8swatcher](https://github.com/bitsofinfo/k8swatcher) will use to connect to kubernetes
+
+* `KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH`: File path to a kubernetes config file that defines the context your reference via `KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME`. This is the k8s config that the underlying [AcmeDnsK8sSecretStore](core/store.py) will use to connect to kubernetes to manage the `acme-dns.json` secret used by `cert-manager`
+
+* `KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME`: the kubernetes context name expected to be found in `KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH`. This is the k8s context that the underlying [AcmeDnsK8sSecretStore](core/store.py) will use to connect to kubernetes to manage the `acme-dns.json` secret used by `cert-manager`
+
 
 # docker
 
