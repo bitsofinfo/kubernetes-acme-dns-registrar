@@ -5,7 +5,7 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -28,10 +28,10 @@ jobs:
           export VERSION_NUMBER=$(dunamai from git --format dev-0.0.0.{timestamp})
           echo "VERSION_NUMBER: $VERSION_NUMBER"
           echo "VERSION_NUMBER=$VERSION_NUMBER" >> $GITHUB_ENV
-
+      
       - name: Dev Build and push
         if: startsWith(github.ref, 'refs/tags') == false
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kubernetes-acme-dns-registrar:${{ env.VERSION_NUMBER }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kubernetes-acme-dns-registrar:${{ env.VERSION_NUMBER }},${{ secrets.DOCKERHUB_USERNAME }}/kubernetes-acme-dns-registrar:latest-dev

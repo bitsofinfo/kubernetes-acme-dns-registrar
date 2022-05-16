@@ -100,10 +100,10 @@ Please check-out [docs/setup](docs/setup.md)
 # docker
 ## Docker Build:
 
-The [Dockerfile](Dockerfile) can be built with the following command:
+The [Dockerfile](Dockerfile) can be built locally with the following command:
 
 ```
-docker build -t kubernetes-acme-dns-registrar:0.0.1 .
+docker build -t kubernetes-acme-dns-registrar:<your-tag> .
 ```
 
 ## Docker Run manual:
@@ -124,9 +124,9 @@ docker run \
     -e KADR_K8S_WATCHER_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
     -e KADR_K8S_WATCHER_CONTEXT_NAME=my-k8s-context \
     -e KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
-    -e KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME=my-k8s-context
+    -e KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME=my-k8s-context \
         \
-    kubernetes-acme-dns-registrar:0.0.1
+    bitsofinfo/kubernetes-acme-dns-registrar:latest
 ```
 
 ## Docker Run with .env file:
