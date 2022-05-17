@@ -62,8 +62,8 @@ class DnsProviderProcessor(Thread):
         return enabled_dns_providers
 
     def process_dns_registration_events(self):
-        try:
-            while True:
+        while True:
+            try:
                 acme_dns_registration_event:AcmeDnsRegistationEvent = self.acme_dns_registration_queue.get()
 
                 domain_name = acme_dns_registration_event.registration.source_domain_name_event.domain_name
@@ -91,8 +91,8 @@ class DnsProviderProcessor(Thread):
 
                     self.logger.debug(f"process_dns_registration_events() successfully completed for: {dns_provider.get_dns_provider_name()}")
 
-        except Exception as e:
-            self.logger.exception(f"process_dns_registration_events() unexpected error: {str(sys.exc_info()[:2])}")
+            except Exception as e:
+                self.logger.exception(f"process_dns_registration_events() unexpected error: {str(sys.exc_info()[:2])}")
 
         
     def run(self):

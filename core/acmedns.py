@@ -84,7 +84,7 @@ class ACMEDnsRegistrar(Thread):
                     zone_config = self.get_zone_config(domain_name_event.domain_name)
                     acme_dns_registration_url = zone_config["acme_dns_registration_url"]
                     acme_dns_registration_url = zone_config["acme_dns_registration_url"]
-                    acme_dns_registration_response = requests.post(acme_dns_registration_url, data=None)
+                    acme_dns_registration_response = requests.post(acme_dns_registration_url, data=None, timeout=30)
 
                     self.logger.debug(f"run() POSTed registration @ {acme_dns_registration_url} for {domain_name_event.domain_name} OK")
 

@@ -7,8 +7,15 @@ class DnsProvider(BaseAzureDnsProvider):
 
     def init_dns_client(self) -> str:
         self.dns_client = PrivateDnsManagementClient(
-            self.credentials,
-            self.subscription_id
+            credential=self.credentials,
+            subscription_id=self.subscription_id,
+
+            # https://docs.microsoft.com/en-us/azure/developer/python/sdk/azure-sdk-library-usage-patterns?view=azure-python&tabs=pip#optional-arguments-for-client-objects-and-methods
+            kwargs={
+                "connection_timeout":10,
+                "read_timeout":30,
+                "retry_total":10
+            }
         )
         return self.dns_client
 
