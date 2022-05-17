@@ -13,7 +13,7 @@
 #---------------------------------------------------------------------------
 
 k8s_watch_configs:
-  - id: all_ingress_edg-apps
+  - id: all_ingress_my-apps
     namespace: my-apps
     kind: Ingress
     sdk_client_class_name: NetworkingV1Api
