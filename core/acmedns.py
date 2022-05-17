@@ -57,18 +57,18 @@ class ACMEDnsRegistrar(Thread):
         await self.acme_dns_k8s_secret_store.put_acme_dns_registrations_k8s_secret_data(acme_dns_registration_secret_data)
 
     async def do_processing(self):
-        try:
-           while True:
+        while True:
+            try:
                 domain_name_event:DomainNameEvent = self.domain_name_event_queue.get()
 
                 self.logger.debug(f"run() received DomainNameEvent for {domain_name_event.type} {domain_name_event.domain_name}")
 
                 registration:Registration = \
-                   self.registration_store.get_registration(domain_name_event.domain_name)
+                    self.registration_store.get_registration(domain_name_event.domain_name)
 
                 if registration:
                     self.logger.debug(f"run() existing Registration record exists for {domain_name_event.domain_name} ... updating latest event meta-data")
- 
+
                     registration.updated_at = datetime.utcnow()
                     registration.last_event_type = domain_name_event.type
                     registration.source_domain_name_event = domain_name_event
@@ -80,14 +80,14 @@ class ACMEDnsRegistrar(Thread):
                         continue
 
                     self.logger.debug(f"run() no Registration record exists for {domain_name_event.domain_name} ... creating")
- 
+
                     zone_config = self.get_zone_config(domain_name_event.domain_name)
                     acme_dns_registration_url = zone_config["acme_dns_registration_url"]
                     acme_dns_registration_url = zone_config["acme_dns_registration_url"]
                     acme_dns_registration_response = requests.post(acme_dns_registration_url, data=None)
 
                     self.logger.debug(f"run() POSTed registration @ {acme_dns_registration_url} for {domain_name_event.domain_name} OK")
- 
+
 
                     acme_dns_registration:AcmeDnsRegistration = \
                             AcmeDnsRegistration(**acme_dns_registration_response.json())
@@ -127,8 +127,8 @@ class ACMEDnsRegistrar(Thread):
 
                 self.acme_dns_registration_queue.put(acme_dns_register_event)
             
-        except Exception as e : 
-            self.logger.exception(f"ACMEDnsRegistrar().run() unexpected error: {str(sys.exc_info()[:2])}")
+            except Exception as e : 
+                self.logger.exception(f"ACMEDnsRegistrar().run() unexpected error: {str(sys.exc_info()[:2])}")
 
 
     def run(self):
