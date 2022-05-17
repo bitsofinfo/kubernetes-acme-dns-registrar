@@ -21,6 +21,9 @@ This project attempts to address the manual steps as described here in the [cert
   - [Docker Build:](#docker-build)
   - [Docker Run manual:](#docker-run-manual)
   - [Docker Run with .env file:](#docker-run-with-env-file)
+- [kubernetes](#kubernetes)
+  - [helm chart](#helm-chart)
+  - [kubernetes manifest](#kubernetes-manifest)
 - [API](#api)
 - [local dev](#local-dev)
   - [local run](#local-run)
@@ -190,6 +193,13 @@ docker run \
         \
     bitsofinfo/kubernetes-acme-dns-registrar:dev-latest
 ```
+
+# kubernetes
+
+This application can be run anywhere, including within kubernetes itself. 
+## helm chart
+
+## kubernetes manifest
 # API
 
 Once you start up the registrar, you can access the following endpoints:

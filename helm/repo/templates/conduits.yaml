@@ -1,0 +1,401 @@
+{{- /* ---------------------------------------------------------------
+      REQUIRED ITEMS
+      Note these are vars that have no default value in values.yaml
+---------------------------------------------------------------------- */ -}}
+{{ $conduitname := required "conduitname is REQUIRED!" .Values.conduitname }}
+
+
+
+{{- /* ---------------------------------------------------------------
+      CORE VARS
+---------------------------------------------------------------------- */ -}}
+{{- $defaultServiceType := .Values.service.type -}}
+{{- $defaultServicePort := .Values.service.port -}}
+{{- $defaultServiceSelectors := .Values.service.selectors -}}
+{{- $defaultServiceTargetPort := .Values.service.targetPort -}}
+{{- $namespace := .Release.Namespace -}}
+{{- $classifier := .Values.classifier -}}
+{{- $ingressDefaults := .Values.ingress }}
+{{- $defaultIngressLabels := $ingressDefaults.metadata.labels -}}
+{{- $defaultIngressAnnotations := $ingressDefaults.metadata.annotations -}}
+{{- $hooks := .Values.hooks -}}
+
+
+{{- /* ---------------------------------------------------------------
+      Standard Labels TEMPLATE
+      Usage {{ include "stdlabels.tpl" $stdlabelsargs | indent N }}
+--------------------------------------------------------------- */}}
+{{ $stdlabelsargs := dict "values" .Values "chart" .Chart "release" .Release }}
+{{- define "stdlabels.tpl" }}
+"{{ .values.labelNames.conduitName }}": {{ .autoConduitName }}
+"{{ .values.labelNames.creatorId }}": "{{ .values.creatorId | replace "@" "_" }}"
+"app.kubernetes.io/name": {{ .autoConduitName }}-conduit
+"app.kubernetes.io/managed-by": {{ .release.Service }}
+"app.kubernetes.io/instance": {{ .autoConduitName }}-conduit
+"app.kubernetes.io/version": "{{ now | date "2006-01-02T15:04:05-0700" | replace ":" "." | replace "+" "_" }}"
+"app.kubernetes.io/part-of": {{ .autoConduitName }}
+"app.kubernetes.io/component": "conduit"
+"helm.sh/chart": {{ .chart.Name }}-{{ .chart.Version }}
+{{- end }}
+
+
+{{- /* ---------------------------------------------------------------
+      Process Each "context"
+---------------------------------------------------------------------- */}}
+{{- range $contextName,$context := .Values.conduits.contexts -}}
+
+  {{- $autoConduitName := printf "%s-%sNOCLASSIFIER-%s" $conduitname $classifier $contextName }}
+  {{- $autoConduitName := $autoConduitName | replace "-NOCLASSIFIER" "" -}}
+  {{- $autoConduitName := $autoConduitName | replace "NOCLASSIFIER" "" -}}
+  {{- $autoConduitName := $autoConduitName | replace "-%!s(<nil>)" "" -}}
+
+  {{- $tmp := set $stdlabelsargs "autoConduitName" $autoConduitName }}
+
+  {{- /* ---------------------------------------------------------------
+        For each "service" within the $context we create a
+        named "Service" bound to the defined pod label selectors...
+  ---------------------------------------------------------------------- */}}
+  {{- range $serviceName, $service := $context.services -}}
+
+# SERVICE {{ $contextName}} -> {{ $serviceName }}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: "{{ $namespace }}"
+  name: "{{ $conduitname }}-{{ $contextName }}-{{ $serviceName }}"
+  labels:
+    {{ include "stdlabels.tpl" $stdlabelsargs | indent 4 }}
+spec:
+  selector:
+    "{{$defaultServiceSelectors.contextLabelName}}": "{{$contextName}}"
+
+    {{- range $defaultSelector := $defaultServiceSelectors.selectors }}
+    "{{ $defaultSelector.name }}": "{{$defaultSelector.value}}"
+    {{ end }}
+
+    {{- range $label, $value := $service.selector }}
+    {{ $label }}: "{{ $value }}"
+    {{- end }}
+
+  type: {{ $defaultServiceType }}
+  ports:
+  {{ if $service.port }}
+  - protocol: TCP
+    port: {{ $service.port }}
+    targetPort: {{ $service.targetPort }}
+  {{ else }} {{- /* defaults */ -}}
+  - protocol: TCP
+    port: {{ $defaultServicePort }}
+    targetPort: {{ $defaultServiceTargetPort }}
+  {{ end }}
+
+---
+  {{ end }} {{- /* END for each $context.service */}}
+
+
+
+  {{- /* ---------------------------------------------------------------
+        For each "ingress" within the $context we create a Ingress
+        for each defined "host" pointing to its configured "serviceBindings"
+  ---------------------------------------------------------------------- */}}
+  {{- range $ingressName, $ingress := $context.ingress -}}
+    {{- range $ingressMapping := $ingress.mappings -}}
+
+    {{- /*
+        We need to get a 'sample' from context.services, of one of the ingressMapping.serviceBindings
+        we can just use the first one, as even if we are going across multiple versions
+        (i.e. split %) any one of the targets will suffice as we just need to inpect the `tls`
+        property from one of them. (see below for targetService.service.tls). This ASSUMES
+        that if splitting across multiple services, the tls/port settings would be the same
+        across them... otherwise you are doing something a bit strange.
+    */}}
+    {{- $targetService := dict }}
+    {{- range $serviceBindingName, $percentage := $ingressMapping.serviceBindings -}}
+      {{- $_ := set $targetService "service" (pluck $serviceBindingName $context.services | first) -}}
+    {{- end }}
+
+      {{- /*
+          Create a separate Ingress per host
+
+          We have to do this because of the 'dns:true|false' property
+          which lets us properly label it for external-dns as to be
+          created or not as by default (unless excluded by an external-dns label)
+          ALL Ingresses are consumed into DNS...
+
+          https://github.com/kubernetes-incubator/external-dns/issues/1053
+      */}}
+      {{ range $host := $ingressMapping.hosts -}}
+
+      {{- /* Each 'host' entry can override TLS settings lets */}}
+      {{ $tlsSettings := dict }}
+      {{ $tlsSettings := hasKey $ingressDefaults "tls" | ternary (mergeOverwrite $tlsSettings ($ingressDefaults.tls)) $tlsSettings }}
+      {{ $tlsSettings := hasKey $host "tls" | ternary (mergeOverwrite $tlsSettings ($host.tls)) $tlsSettings }}
+
+
+      {{ $ingressK8sName := printf "%s.%sNOCLASSIFIER.%s.%s--%s" $conduitname $classifier $ingressName $ingressMapping.name $host.name }}
+      {{- $ingressK8sName := $ingressK8sName | replace ".NOCLASSIFIER" "" -}}
+      {{- $ingressK8sName := $ingressK8sName | replace "NOCLASSIFIER" "" -}}
+      {{- $ingressK8sName := $ingressK8sName | replace ".%!s(<nil>)" "" -}}
+
+# INGRESS
+apiVersion: {{ $ingressDefaults.k8sApiVersion }}
+kind: Ingress
+metadata:
+  namespace: {{ $namespace }}
+  name: "{{ $ingressK8sName }}"
+  labels:
+  {{- range $labelName,$labelValue := $defaultIngressLabels }}
+    "{{ $labelName }}": "{{ $labelValue }}"
+  {{- end }}
+  {{ if and $ingressMapping.labels }}
+    {{- range $key, $value := $ingressMapping.labels }}
+    "{{ $key }}": "{{ $value }}"
+    {{- end }}
+  {{ end }}
+  {{ if and $host.labels }}
+    {{- range $key, $value := $host.labels }}
+    "{{ $key }}": "{{ $value }}"
+    {{- end }}
+  {{ end }}
+  {{ include "stdlabels.tpl" $stdlabelsargs | indent 4 }}
+  annotations:
+    {{- range $annotationName,$annotationValue := $defaultIngressAnnotations }}
+    "{{ $annotationName }}": "{{ $annotationValue }}"
+    {{- end }}
+    {{ if and $ingressMapping.annotations }}
+    {{- range $key, $value := $ingressMapping.annotations }}
+    "{{ $key }}": "{{ $value }}"
+    {{- end }}
+    {{ end }}
+    {{ if and $host.annotations }}
+    {{- range $key, $value := $host.annotations }}
+    "{{ $key }}": "{{ $value }}"
+    {{- end }}
+    {{ end }}
+
+    {{ if and (hasKey $host "dns") (not $host.dns) }}
+      {{ range $annotation := $ingressDefaults.mappings.hosts.dns.else.annotations }}
+    "{{$annotation.name}}": "{{$annotation.value}}"
+      {{ end }}
+    {{ else }}
+      {{ range $annotation := $ingressDefaults.mappings.hosts.dns.ifTrue.annotations }}
+    "{{$annotation.name}}": "{{$annotation.value}}"
+      {{ end }}
+    {{ end }}
+
+
+    {{ if hasKey $targetService.service "tls" }}
+      {{ if not $targetService.service.tls }}
+    ingress.kubernetes.io/protocol: "http"
+      {{ else }}
+    ingress.kubernetes.io/protocol: "https"
+      {{ end }}
+    {{ else }}
+    ingress.kubernetes.io/protocol: "https"
+    {{ end }}
+
+    traefik.ingress.kubernetes.io/service-weights: |
+      {{ range $serviceName, $percentage := $ingressMapping.serviceBindings -}}
+      {{ $conduitname }}-{{ $contextName }}-{{ $serviceName }}: {{ $percentage }}
+      {{ end }}
+
+spec:
+
+  {{ if $ingressDefaults.ingressClassName }}
+  ingressClassName: {{ $ingressDefaults.ingressClassName }}
+  {{ end }}
+
+  {{ if $tlsSettings.enabled }}
+  tls:
+    - hosts:
+      - {{ $host.name }}
+      secretName: {{ $tlsSettings.secretName }}
+  {{ end }}
+  rules:
+    - host: {{ $host.name }}
+      http:
+        paths:
+          {{ range $serviceName, $percentage := $ingressMapping.serviceBindings -}}
+          {{ if and $ingressMapping.paths }}
+          {{ range $path := $ingressMapping.paths -}}
+          - path: {{ $path }}
+            backend:
+              {{ if eq $ingressDefaults.k8sApiVersion "networking.k8s.io/v1" }}
+              service:
+                name: "{{ $conduitname }}-{{ $contextName }}-{{ $serviceName }}"
+                port:
+                  {{ if $targetService.service.port }}
+                  number: {{ $targetService.service.port }}
+                  {{ else }}
+                  number: {{ $defaultServicePort }}
+                  {{ end }}
+              {{ else }}
+              serviceName: "{{ $conduitname }}-{{ $contextName }}-{{ $serviceName }}"
+              {{ if $targetService.service.port }}
+              servicePort: {{ $targetService.service.port }}
+              {{ else }}
+              servicePort: {{ $defaultServicePort }}
+              {{ end }}
+              {{ end }}
+            {{ if $ingressDefaults.pathType }}pathType: {{ $ingressDefaults.pathType }}{{ end }}
+          {{ end }}
+          {{ else }}
+          - backend:
+              {{ if eq $ingressDefaults.k8sApiVersion "networking.k8s.io/v1" }}
+              service:
+                name: "{{ $conduitname }}-{{ $contextName }}-{{ $serviceName }}"
+                port:
+                  {{ if $targetService.service.port }}
+                  number: {{ $targetService.service.port }}
+                  {{ else }}
+                  number: {{ $defaultServicePort }}
+                  {{ end }}
+              {{ else }}
+              serviceName: "{{ $conduitname }}-{{ $contextName }}-{{ $serviceName }}"
+              {{ if $targetService.service.port }}
+              servicePort: {{ $targetService.service.port }}
+              {{ else }}
+              servicePort: {{ $defaultServicePort }}
+              {{ end }}
+              {{ end }}
+            {{ if $ingressDefaults.pathType }}pathType: {{ $ingressDefaults.pathType }}{{ end }}
+          {{ end }}
+          {{ end }}
+---
+      {{ end }} {{- /* END range $host := $ingressMapping.hosts */}}
+
+    {{ end }} {{- /* END range $ingressMapping := $ingress.mappings */}}
+
+  {{ end }} {{- /* END range $ingressName, $ingress := $context.ingress */}}
+
+
+
+
+{{ $hookK8sNamePrefix := printf "%s-%s-%sNOCLASSIFIER" $conduitname $contextName $classifier }}
+{{- $hookK8sNamePrefix := $hookK8sNamePrefix | replace "-NOCLASSIFIER" "" -}}
+{{- $hookK8sNamePrefix := $hookK8sNamePrefix | replace "NOCLASSIFIER" "" -}}
+{{- $hookK8sNamePrefix := $hookK8sNamePrefix | replace "-%!s(<nil>)" "" -}}
+
+{{/* -------------------------------------------
+     HOOK Support: POST INSTALL UPGRADE ConfigMap
+
+     Stores the Slack Alert POST body that describes
+     the state of the conduits applied which is
+     mounted as a volume on the Helm Hook Job (below)
+------------------------------------------------ */}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $hookK8sNamePrefix }}-conduitsalert-config
+  namespace: "{{ $namespace }}"
+  labels:
+    {{ include "stdlabels.tpl" $stdlabelsargs | indent 4 }}
+data:
+  slackalert.json: |
+    {
+      "text":"*Conduits Applied:* {{ $hookK8sNamePrefix }}",
+      "attachments": [
+
+          {{- range $ingressName, $ingress := $context.ingress -}}
+          {{- range $ingressMapping := $ingress.mappings -}}
+
+            {
+              "title" : "",
+              "color": "good",
+              "mrkdwn": true,
+              "author_name": "appconduits: {{ $conduitname }}-{{ $contextName }} {{ $ingressName }}.{{ $ingressMapping.name }}",
+              "author_icon": "https://platform.slack-edge.com/img/default_application_icon.png",
+              "mrkdwn_in": [ "Hosts","Paths","Selectors"],
+              "fields": [
+                {
+                  "title": "Hosts",
+                  "value":"```{{- range $host := $ingressMapping.hosts -}}{{$host.name}}\n{{- end -}}```",
+                  "short": false
+                },
+                {
+                  "title": "Paths",
+                  "value":"```{{ if and $ingressMapping.paths }}{{ range $path := $ingressMapping.paths -}}{{$path}}\n{{- end -}}{{- else -}}*{{- end -}}```",
+                  "short": true
+                },
+                {
+                  "title": "Labels",
+                  "value":"```{{ if and $ingressMapping.labels }}{{- range $key, $value := $ingressMapping.labels }}{{$key}}: {{$value}}\n{{- end -}}{{- else -}}none{{- end -}}```",
+                  "short": true
+                }
+
+                {{ range $serviceName, $percentage := $ingressMapping.serviceBindings -}}
+
+                  {{/* this BS gets us context.[servicename] */}}
+                  {{ $targetService := pick $context.services $serviceName | values | first }}
+
+                  ,{
+                    "title": "{{$percentage}} -> {{$serviceName}} selectors",
+                    "value":"```{{- range $selector,$val := $targetService.selector -}}{{$selector}}: {{$val}}\n{{- end -}}{{$defaultServiceSelectors.contextLabelName}}: {{ $contextName }}{{- range $defaultSelector := $defaultServiceSelectors.selectors }}\n{{ $defaultSelector.name }}: {{$defaultSelector.value}}{{ end }}```",
+                    "short": false
+                  }
+
+                {{ end }}
+
+              ]
+            },
+
+          {{- end }}
+          {{- end }}
+      ]
+    }
+
+
+
+
+{{/* -------------------------------------
+     HOOK: POST INSTALL/UPGRADE Job
+
+     CURL alert Job that consumes the slackalert.json
+     ConfigMap created above. This is a Helm Hook
+------------------------------------------ */}}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ $hookK8sNamePrefix }}-conduitsalert"
+  namespace: "{{ $namespace }}"
+  labels:
+    {{ include "stdlabels.tpl" $stdlabelsargs | indent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+spec:
+  backoffLimit: 0 # retry 0 times
+  activeDeadlineSeconds: 300 # max run for 10 minutes (i.e. inclusive of retries)
+  template:
+    metadata:
+      name: "{{ $hookK8sNamePrefix }}-conduitsalert"
+    spec:
+      restartPolicy: Never
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ $hookK8sNamePrefix }}-conduitsalert-config
+      containers:
+        - name: {{ $hookK8sNamePrefix }}-conduitsalert
+          image: "byrnedo/alpine-curl:latest"
+          command:
+            - "curl"
+          args:
+            - "-v"
+            - "-X"
+            - "POST"
+            - "-H"
+            - 'Content-type: application/json'
+            - '-d'
+            - '@/etc/config/slackalert.json'
+            - "{{ $hooks.postInstallUpgrade.webhook_url }}"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+
+
+
+{{ end }} {{- /* END range $contextName,$context := .Values.conduits.contexts */}}

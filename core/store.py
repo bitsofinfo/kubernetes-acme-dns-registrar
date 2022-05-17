@@ -72,8 +72,8 @@ class AcmeDnsK8sSecretStore():
         
         # configure our kube client
         k8s_settings = K8sSettings()
-        k8s_config_file_path = k8s_settings.KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH
-        k8s_config_context_name = k8s_settings.KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME
+        k8s_config_file_path = k8s_settings.get("KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH")
+        k8s_config_context_name = k8s_settings.get("KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME")
         self.logger.debug(f"AcmeDnsK8sSecretStore() loading kube config: k8s_config_file_path={k8s_config_file_path} k8s_config_context_name={k8s_config_context_name} (Note: 'None' = using defaults)")
         config.load_kube_config(config_file=k8s_config_file_path, context=k8s_config_context_name)
 

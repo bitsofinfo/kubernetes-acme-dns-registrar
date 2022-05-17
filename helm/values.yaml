@@ -1,0 +1,248 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# appconduits values.yaml defaults
+#   - Required items are marked as such
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Required:
+# It will be included on generated k8s names
+conduitname: ""
+
+# Optional "classifier" default nothing.
+# This is a naming modifier for all generated artifacts
+# i.e. [conduitname][-[classifier]]-[contextname]
+# https://github.com/bitsofinfo/appdeploy#convention
+classifier: ""
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# REQUIRED:
+# CONDUITS DEFINITIONS: none by default, you must define
+#
+# Here is where the rubber hits the road and where we define actual "conduits"
+#
+# For an working example see:
+# https://github.com/bitsofinfo/appconduits/blob/master/examples
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+conduits:
+
+  # Each set of conduits is scoped within a "context" which is simply
+  # a sub-scope within a "environment". It is just an arbitrary name
+  # that you can set to whatever you'd like
+  # @see: https://github.com/bitsofinfo/appdeploy#convention
+  # It will be included on generated k8s names
+  contexts:
+
+    # Context "name"
+    # It will be included on generated k8s names
+    #
+    #some-context-name:
+
+      # ---------------------
+      # SERVICES
+      # Here we define one or more named "services"
+      # Each "service" has a "name" and a set of k8s selectors
+      # which define what pods the service will target
+      #-----------------------
+
+      #services:
+
+        # service "name"
+        # It will be included on generated k8s names
+        #
+        #service-a:
+
+          # If the port of the app the service is for is other than 80
+          # which is configured in the defaults "service" section below
+          #
+          # port: [otherPort]
+          # targetPort: [otherPort]
+
+          # If the application the service is for exposes TLS or not
+          # optional: default true
+          #
+          #tls: false
+
+          # The service's selectors, can be any valid k8s label selectors
+          # Note: the context selector is ALWAYS applied as such
+          # so you don't need to add it manually
+          # {service.selectors.contextLabelName}: {{$currentContext}}
+          #
+          #selector:
+            #app-name: "somAppName"
+            #app-version: "1.0.0"
+
+
+      # ---------------------
+      # INGRESSs
+      # Here we define one or more named "Ingress"
+      # Each "ingress" has a "name" and a set of one
+      # or more "mappings" which configure host/paths
+      # that will configured on the generated Ingress'
+      # as well as the 'serviceBindings' for the Ingress
+      # that point back to the named "services" defined above
+      #-----------------------
+      #
+      #ingress:
+
+        # ingress "name"
+        # It will be included on generated k8s names
+        #
+        #live:
+
+          # Each ingress can have 1-N "mappings"
+          #
+          #mappings:
+
+            # REQUIRED: arbitrary name
+            # It will be included on generated k8s names
+            #- name: root
+
+            # Optional: One ore more annotations to apply to each Ingress generated
+            #
+            #  annotations:
+            #    traefik.ingress.kubernetes.io/rule-type: Path
+
+            # Optional: One or more labels to apply to each Ingress generated
+            #
+            #  labels:
+            #    bitsofinfo-ingress: "yes"
+
+            # REQUIRED:
+            # Important!: for each "host" below a separate Ingress
+            # object will be generated explicity for it. Why?
+            # because if you are using a program that consumes
+            # Ingress definitions (i.e like external-dns) that
+            # creates DNS entries for ANY "host" in an ingress
+            # and the only way to filter is via Ingress labels
+            # then having a 1-to-1 between Ingress and Hosts gives
+            # you the ability to cleanly label one Ingress/Host for
+            # consumption for dns automation, and omit it for another one.
+            # If you don't do this, and have many hosts per Ingress
+            # then it becomes hard if not impossible to exclude certain
+            # 'hosts' as candidates for consumption by a tool like
+            # external-dns (at least as of Q2 2019...)
+            # https://github.com/kubernetes-incubator/external-dns/issues/1053
+            #
+            #  hosts:
+            #    - name: "animals.idontmanagedns.com"
+            #      dns: false  # if FALSE then ingress.mappings.hosts.dns.else.labels will be applied
+            #
+            #    - name: "animals.mydomain.com"
+            #      dns: true   # if TRUE then ingress.mappings.hosts.dns.ifTrue.labels will be applied
+            #      tls:
+            #        secretName: "custom-secret-name" # overrides ingress.tls.secretName default
+            #
+            #    - name: "nontlsanimals.mydomain.com"
+            #      dns: true   # if TRUE then ingress.mappings.hosts.dns.ifTrue.labels will be applied
+            #      tls:
+            #        enabled: false # tls off
+            #      annotations:   # optional annotations for this HOST only
+            #        key: "value"
+            #      labels:        # optional labels for this HOST only
+            #        key: "value"
+
+            # OPTIONAL: one or more paths
+            #
+            #  paths:
+            #    - "/"
+
+            # REQUIRED: at least ONE named "service" (above) should be listed
+            # here with a percentage. You can list multiple....
+            #
+            #  serviceBindings:
+            #    service-a: "100%"
+
+
+
+# The user installing/upgrading the chart
+# this will be decorated on every object as
+# an additional label
+creatorId: "unknown@bitsofinfo.appconduits.chart"
+
+# The label "names" (i.e. keys) for common labels
+# that will be applied to all created k8s objects
+labelNames:
+  conduitName: "conduit-name"
+  creatorId: "creator-id"
+
+# Defaults for k8s Services that will be generated
+service:
+  type: ClusterIP
+  port: 80 # the default, you can override per service mappings with each contexts.[contextname].services.[servicename].port
+  targetPort: 80 # the default, you can override per service mappings with each contexts.[contextname].services.[servicename].targetPort
+  selectors:
+    # for each service generated, since scoped by "context" we always
+    # apply the context name to selector label.
+    # Will yield {{contextLabelName}}: {{serviceContext}}
+    contextLabelName: "app-context"
+
+    # additional default selectors to apply to all services beyond
+    # those specified per contexts.[contextName].services.[servicename] declaration
+    defaults: []
+      #- name: "selector-label
+      #  value: "selector-value"
+
+# Defaults for all k8s Ingress objects that will be generated
+ingress:
+
+  k8sApiVersion: "networking.k8s.io/v1beta1"
+
+  # should only be set to something on k8s 1.18+
+  # leaving as a blank string "" will not emit it
+  # into the ingress object
+  pathType: ""
+
+  # the ingressClassName required for networking.k8s.io/v1
+  # otherwise defaults to nothing (empty string), won't be applied
+  # this CANNOT co-exist w/ annotation "kubernetes.io/ingress.class"
+  # only available in k8s 1.18+ 
+  ingressClassName: ""
+  
+  metadata:
+
+    # defaults labels, you can add more in each indivdual ingress mapping via
+    # contexts.[contextname].services.[ingressname].mappings.labels []
+    # tpl variable substitution supported in values here. See README
+    labels:
+      #"label/name1": "something" # PARSED by Helm 'tpl' function passed $
+      #labelName2: "something" # PARSED by Helm 'tpl' function passed $
+
+    # defaults annotations, you can add more in each indivdual ingress mapping via
+    # contexts.[contextname].services.[ingressname].mappings.annotations []
+    # TODO: get rid of this default, traefik specific
+    # tpl variable substitution supported in values here. See README
+    annotations:
+      kubernetes.io/ingress.class: "traefik"
+      #annotationName2: "something" # PARSED by Helm 'tpl' function passed $
+
+  # The tls config defined here if enabled, will be applied to each
+  # host in a conduit, unless overriden on a per host declaration
+  # under the "conduits..ingress.mappings" structures above
+  tls:
+    enabled: false
+    secretName: ""
+
+  # Configs for behaviors in
+  # contexts.[contextname].services.[ingressname].mappings entries
+  mappings:
+    # if mapping.hosts contain entries where `dns:true` this gives us options
+    # for what Ingress.metadata.annotations will or will NOT be applied based on the
+    # value of the `hosts.dns` values
+    hosts:
+      dns:
+        ifTrue:
+          annotations:
+            - name: "external-dns"
+              value: "enabled"
+        else:
+          annotations:
+            - name: "external-dns"
+              value: "disabled"
+
+
+# Hooks that run, currently only one which is informational
+hooks:
+  # The postInstallUpgrade hook sends a summary of the conduits state
+  # that was applied
+  postInstallUpgrade:
+    webhook_url: https://hooks.slack.com/services/YOU/NEED/TO/PROVIDE
