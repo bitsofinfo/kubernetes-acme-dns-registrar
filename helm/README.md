@@ -7,7 +7,7 @@ Please see [values.yaml](values.yaml) for all configurable options.
 ## Using!
 
 ```
-helm repo add bitsofinfo-appdeploy https://raw.githubusercontent.com/bitsofinfo/kubernetes-acme-dns-registrar/master/repo
+helm repo add bitsofinfo-kubernetes-acme-dns-registrar https://raw.githubusercontent.com/bitsofinfo/kubernetes-acme-dns-registrar/master/repo
 helm repo update
 ```
 
