@@ -9,10 +9,10 @@ from .models import *
 from .settings import SmartSettings
 
 class K8sSettings(SmartSettings):
-    KADR_K8S_WATCHER_CONFIG_FILE_PATH:Optional[str]
+    KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH:Optional[str]
     KADR_K8S_WATCHER_CONTEXT_NAME:Optional[str]
 
-    KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH:Optional[str]
+    KADR_K8S_ACMEDNS_SECRETS_STORE_KUBE_CONFIG_FILE_PATH:Optional[str]
     KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME:Optional[str]
 class K8sKindHostExtractor(ABC):
     

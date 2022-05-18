@@ -5,6 +5,7 @@ dev.*.yaml
 secrets.env
 secrets*
 *.secret
+*secrets*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

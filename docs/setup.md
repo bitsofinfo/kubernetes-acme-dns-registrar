@@ -109,3 +109,5 @@ spec:
 ## 7. Install kubernetes-acme-dns-registrar
 
 Ok, now lets tie everything above together w/ `kubernetes-acme-dns-registrar`
+
+TBD

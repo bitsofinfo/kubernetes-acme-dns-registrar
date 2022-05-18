@@ -1,0 +1,38 @@
+{{ $_ := required "k8swatcher.configYaml is REQUIRED!" .Values.k8swatcher.configYaml }}
+{{ $_ := required "dnsproviders.configYaml is REQUIRED!" .Values.dnsproviders.configYaml }}
+{{ $_ := required "acmedns.configYaml is REQUIRED!" .Values.acmedns.configYaml }}
+
+{{- $_ := set . "stdlabelsargs" (dict "root" $) }}
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{ include "kadr.stdlabels" $.stdlabelsargs | indent 4 }}
+data: 
+
+  {{- if hasKey .Values.acmedns "secretStore" }}
+    {{- if hasKey .Values.acmedns.secretStore "k8sContextName" }}
+  KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME: {{ .Values.acmedns.secretStore.k8sContextName }}
+    {{ end }}
+  {{ end }}
+
+  {{- if hasKey .Values.k8swatcher "k8sContextName" }}
+  KADR_K8S_WATCHER_CONTEXT_NAME: {{ .Values.k8swatcher.k8sContextName }} 
+  {{ end }}
+
+  KADR_K8S_WATCHER_CONFIG_YAML: |
+    {{ .Values.k8swatcher.configYaml | nindent 4 }}
+
+  KADR_DNS_PROVIDER_CONFIG_YAML: |
+    {{ .Values.dnsproviders.configYaml | nindent 4 }}
+
+  KADR_ACME_DNS_CONFIG_YAML: |
+    {{ .Values.acmedns.configYaml | nindent 4 }}
+    
+
+
+

@@ -1,1 +1,120 @@
-tbd
+
+#####################################################
+#
+# Basic k8s Deployment configuration
+#
+#####################################################
+
+deployment:
+  image: registry.hub.docker.com/bitsofinfo/kubernetes-acme-dns-registrar
+  tag: dev-0.0.0.20220517202536
+  
+
+#####################################################
+#
+# Values for the the RBAC configuration of this chart
+#
+#####################################################
+rbac:
+  enabled: true # false = RBAC will not be configured
+
+  serviceAccountName: kubernetes-acme-dns-registrar
+  serviceAccountNamespace: cert-manager
+
+  # the RBAC creates a ClusterRole that has permissions
+  # to the acme-dns.json secret + the permissions
+  # so that k8swatcher can WATCH various kinds of events
+  clusterRoleName: kubernetes-acme-dns-registrar
+  clusterRoleBindingName: kubernetes-acme-dns-registrar
+
+  # the name & namespace of the acme-dns solver secret as
+  # configured in cert-manager; this is the secret
+  # that contains the acme-dns.json that holds all
+  # registrations against acme-dns
+  # @ see https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/
+  #
+  acmeDnsJsonSecretName: acme-dns
+  acmeDnsJsonSecretNamespace: cert-manager
+  
+
+
+#####################################################
+#
+# Values for the registrar's rest API
+#
+#####################################################
+
+#api:
+  # the jwt secret key that will be used when signing JWT tokens
+  #jwtSecretKey: FILLMEIN!
+
+#####################################################
+#
+# Values for the acme-dns registrar behavior
+#
+#####################################################
+
+#acmedns:
+
+  # The contents of the acme-dns-config.yaml config file
+  # you can set this inline directly or via a file
+  # configYaml: RAW YAML CONTENTS | pass via --set-file x.y=/path/to/file
+
+  #-------------------------------------------------
+  # The following 2 values should only be set if you are NOT wanting
+  # to use the ServiceAccount and RBAC this chart creates
+  # and the k8s token that is auto mounted to the pods
+  # via: https://kubernetes.io/docs/tasks/run-application/access-api-from-pod/#directly-accessing-the-rest-api
+  #
+  # This is the k8s configuration so that the registrar
+  # can update the acme-dns.json secret registration entries
+  # 
+  #--------------------------------------------------
+  #secretStore:
+    #k8sContextName: YOUR KUBE CONTEXT NAMED IN the k8sKubeConfig 
+    #k8sKubeConfig: RAW KUBE CONFIG CONTENTS | pass via --set-file x.y=/path/to/file
+
+
+
+#####################################################
+#
+# Values for the k8swatcher behavior
+#
+#####################################################
+
+#k8swatcher:
+  #-------------------------------------------------
+  # The following 2 values should only be set if you are NOT wanting
+  # to use the ServiceAccount and RBAC this chart creates
+  # and the k8s token that is auto mounted to the pods
+  # via: https://kubernetes.io/docs/tasks/run-application/access-api-from-pod/#directly-accessing-the-rest-api
+  #
+  # This is the configuration that drives k8swatcher
+  # as it watches for configured k8s kind events..
+  #
+  #--------------------------------------------------
+  #k8sContextName: YOUR KUBE CONTEXT NAMED IN the k8sKubeConfig 
+  #k8sKubeConfig: RAW KUBE CONFIG CONTENTS | pass via --set-file x.y=/path/to/file
+
+  # The contents of the k8s-watcher-config.yaml config file
+  # you can set this inline directly or via a file
+  #configYaml:  RAW YAML CONTENTS | pass via --set-file x.y=/path/to/file
+
+
+#####################################################
+#
+# Values for the dnsproviders behavior
+#
+#####################################################
+
+#dnsproviders:
+
+  # The contents of the dns-providers-config.yaml config file
+  # you can set this inline directly or via a file
+  #configYaml:  RAW YAML CONTENTS | pass via --set-file x.y=/path/to/file
+
+  # The contents of the dns-providers-secrets.yaml config file
+  # you can set this inline directly or via a file
+  #secretsYaml:  RAW YAML CONTENTS | pass via --set-file x.y=/path/to/file
+    
+

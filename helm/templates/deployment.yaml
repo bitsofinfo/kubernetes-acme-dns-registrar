@@ -1,0 +1,113 @@
+{{ $_ := required "deployment.image is REQUIRED!" .Values.deployment.image }}
+{{ $_ := required "deployment.tag is REQUIRED!" .Values.deployment.tag }}
+
+{{- $_ := set . "stdlabelsargs" (dict "root" $) }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{ include "kadr.stdlabels" $.stdlabelsargs | indent 4 }}
+spec:
+  replicas: 1 # we only run ONE replica
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{ include "kadr.stdlabels" $.stdlabelsargs | indent 8 }}
+    spec:
+
+      {{- if hasKey .Values.rbac "enabled" }}
+        {{ if eq .Values.rbac.enabled true }}
+      serviceAccountName: {{ .Values.rbac.serviceAccountName }}
+        {{ end }}
+      {{ end }}
+
+      volumes:
+        - name: kadr-configs
+          configMap:
+            name: {{ .Release.Name }}
+
+        - name: kadr-secrets
+          secret:
+            secretName: {{ .Release.Name }}
+            defaultMode: 256
+            items:
+              - key: KADR_JWT_SECRET_KEY
+                path: KADR_JWT_SECRET_KEY
+
+              - key: KADR_DNS_PROVIDER_SECRETS_YAML
+                path: KADR_DNS_PROVIDER_SECRETS_YAML
+
+              - key: KADR_K8S_ACMEDNS_SECRETS_STORE_KUBE_CONFIG
+                path: KADR_K8S_ACMEDNS_SECRETS_STORE_KUBE_CONFIG
+
+              - key: KADR_K8S_WATCHER_KUBE_CONFIG
+                path: KADR_K8S_WATCHER_KUBE_CONFIG
+
+      containers:
+      - name: kubernetes-acme-dns-registrar
+        image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
+        ports:
+          - containerPort: 8000
+
+        volumeMounts:
+          - name: kadr-configs
+            mountPath: "/opt/configs"
+            readOnly: true
+          - name: kadr-secrets
+            mountPath: "/opt/secrets"
+            readOnly: true
+
+        env:
+          - name: KADR_K8S_WATCHER_CONFIG_YAML
+            value: "file@/opt/configs/KADR_K8S_WATCHER_CONFIG_YAML"
+          - name: KADR_ACME_DNS_CONFIG_YAML
+            value: "file@/opt/configs/KADR_ACME_DNS_CONFIG_YAML"
+
+          - name: KADR_DNS_PROVIDER_CONFIG_YAML
+            value: "file@/opt/configs/KADR_DNS_PROVIDER_CONFIG_YAML"
+          - name: KADR_DNS_PROVIDER_SECRETS_YAML
+            value : "file@/opt/secrets/KADR_DNS_PROVIDER_SECRETS_YAML"
+
+          - name: KADR_JWT_SECRET_KEY
+            value: "file@/opt/secrets/KADR_JWT_SECRET_KEY"
+
+          {{- if hasKey .Values.k8swatcher "k8sKubeConfig" }}
+          - name: KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH
+            value: "/opt/secrets/KADR_K8S_WATCHER_KUBE_CONFIG"
+          {{ end }}
+
+          {{- if hasKey .Values.k8swatcher "k8sContextName" }}
+          - name: KADR_K8S_WATCHER_CONTEXT_NAME
+            value: "file@/opt/configs/KADR_K8S_WATCHER_CONTEXT_NAME"
+          {{ end }}
+          
+          {{- if hasKey .Values.acmedns "secretStore" }}
+            {{- if hasKey .Values.acmedns.secretStore "k8sKubeConfig" }}
+          - name: KADR_K8S_ACMEDNS_SECRETS_STORE_KUBE_CONFIG_FILE_PATH
+            value: "/opt/secrets/KADR_K8S_ACMEDNS_SECRETS_STORE_KUBE_CONFIG"
+            {{ end }}
+          {{ end }}
+
+          {{- if hasKey .Values.acmedns "secretStore" }}
+            {{- if hasKey .Values.acmedns.secretStore "k8sContextName" }}
+          - name: KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME
+            value: "file@/opt/configs/KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME"     
+            {{ end }}
+          {{ end }}
+
+        #livenessProbe:
+        #  httpGet:
+        #    scheme: HTTP
+        #    path: /health
+        #    port: 8000
+        #  initialDelaySeconds: 60
+        #  periodSeconds: 30
+        #  timeoutSeconds: 10
+        #  failureThreshold: 5

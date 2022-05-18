@@ -16,6 +16,7 @@ This project attempts to address the manual steps as described here in the [cert
   - [overview of overall setup](#overview-of-overall-setup)
   - [configuration](#configuration)
     - [core ENV variables](#core-env-variables)
+    - [optional k8s specific ENV variables](#optional-k8s-specific-env-variables)
     - [fastapi uvicorn ENV vars](#fastapi-uvicorn-env-vars)
 - [docker](#docker)
   - [Docker Build:](#docker-build)
@@ -122,13 +123,19 @@ See [settings.py](core/settings.py) for more info (which is based off of [pydant
 
 * `KADR_JWT_SECRET_KEY`: string literal config or file reference: `file@/path/to/jwtsecret`. This is the secret key (i.e. string password/value) that will be used by the underlying JWT token signing code that secures the API
 
-* `KADR_K8S_WATCHER_CONFIG_FILE_PATH`: File path to a kubernetes config file that defines the context your reference via `KADR_K8S_WATCHER_CONTEXT_NAME`. This is the k8s config that the underlying [k8swatcher](https://github.com/bitsofinfo/k8swatcher) will use to connect to kubernetes
+### optional k8s specific ENV variables
 
-* `KADR_K8S_WATCHER_CONTEXT_NAME`: the kubernetes context name expected to be found in `KADR_K8S_WATCHER_CONFIG_FILE_PATH`. This is the k8s context that the underlying [k8swatcher](https://github.com/bitsofinfo/k8swatcher) will use to connect to kubernetes
+The following environment variable can optionally be specified if needed. 
 
-* `KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH`: File path to a kubernetes config file that defines the context your reference via `KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME`. This is the k8s config that the underlying [AcmeDnsK8sSecretStore](core/store.py) will use to connect to kubernetes to manage the `acme-dns.json` secret used by `cert-manager`
+Note that when running within kubernetes itself, if the following variables are NOT SET, all kubernetes API authentication will attempt to utilize the running pod's service account credentials located in `/var/run/secrets/kubernetes.io/serviceaccount` [see here for more info](https://kubernetes.io/docs/tasks/run-application/access-api-from-pod/#directly-accessing-the-rest-api). Note the [helm chart](helm/) supports this; creating a service account for you with the minimum appropriate role/permissions.
 
-* `KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME`: the kubernetes context name expected to be found in `KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH`. This is the k8s context that the underlying [AcmeDnsK8sSecretStore](core/store.py) will use to connect to kubernetes to manage the `acme-dns.json` secret used by `cert-manager`
+* `KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH`: File path to a kubernetes config file that defines the context your reference via `KADR_K8S_WATCHER_CONTEXT_NAME`. This is the k8s config that the underlying [k8swatcher](https://github.com/bitsofinfo/k8swatcher) will use to connect to kubernetes
+
+* `KADR_K8S_WATCHER_CONTEXT_NAME`: the kubernetes context name expected to be found in `KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH`. This is the k8s context that the underlying [k8swatcher](https://github.com/bitsofinfo/k8swatcher) will use to connect to kubernetes
+
+* `KADR_K8S_ACMEDNS_SECRETS_STORE_KUBE_CONFIG_FILE_PATH`: File path to a kubernetes config file that defines the context your reference via `KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME`. This is the k8s config that the underlying [AcmeDnsK8sSecretStore](core/store.py) will use to connect to kubernetes to manage the `acme-dns.json` secret used by `cert-manager`
+
+* `KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME`: the kubernetes context name expected to be found in `KADR_K8S_ACMEDNS_SECRETS_STORE_KUBE_CONFIG_FILE_PATH`. This is the k8s context that the underlying [AcmeDnsK8sSecretStore](core/store.py) will use to connect to kubernetes to manage the `acme-dns.json` secret used by `cert-manager`
 
 
 ### fastapi uvicorn ENV vars
@@ -167,9 +174,9 @@ docker run \
     -e KADR_DNS_PROVIDER_CONFIG_YAML=file@/opt/scripts/dns-provider-config.yaml \
     -e KADR_DNS_PROVIDER_SECRETS_YAML=file@/opt/scripts/dns-provider-secrets.yaml \
     -e KADR_JWT_SECRET_KEY=123 \
-    -e KADR_K8S_WATCHER_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
+    -e KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
     -e KADR_K8S_WATCHER_CONTEXT_NAME=my-k8s-context \
-    -e KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
+    -e KADR_K8S_ACMEDNS_SECRETS_STORE_KUBE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
     -e KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME=my-k8s-context \
         \
     bitsofinfo/kubernetes-acme-dns-registrar:dev-latest
@@ -227,9 +234,9 @@ KADR_ACME_DNS_CONFIG_YAML=file@`pwd`/dev.acme-dns-config.yaml \
 KADR_DNS_PROVIDER_CONFIG_YAML=file@`pwd`/dev.dns-provider-config.yaml \
 KADR_DNS_PROVIDER_SECRETS_YAML=file@`pwd`/dev.dns-provider-secrets.yaml \
 KADR_JWT_SECRET_KEY=123 \
-KADR_K8S_WATCHER_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
+KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
 KADR_K8S_WATCHER_CONTEXT_NAME=my-k8s-context \
-KADR_K8S_ACMEDNS_SECRETS_STORE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
+KADR_K8S_ACMEDNS_SECRETS_STORE_KUBE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
 KADR_K8S_ACMEDNS_SECRETS_STORE_CONTEXT_NAME=my-k8s-context \
     \
  uvicorn main:app --reload
@@ -250,6 +257,7 @@ https://github.com/bitsofinfo/k8swatcher
 
 # TODO
 
+* implement `allowFrom` support for acme-dns registrations
 * more robust implementation of `RegistrationStore` (i.e. sqllite etc)
 * configuration of `k8s.py` `K8sKindHostExtractor's` per watcher config, currently assumed Ingress
 

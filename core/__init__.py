@@ -172,6 +172,6 @@ class RegistrarService(Thread, HealthcheckParticipant):
 
         k8s_settings = K8sSettings()
 
-        return K8sWatcherService(k8s_config_file_path=k8s_settings.get("KADR_K8S_WATCHER_CONFIG_FILE_PATH"),
+        return K8sWatcherService(k8s_config_file_path=k8s_settings.get("KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH"),
                                  k8s_config_context_name=k8s_settings.get("KADR_K8S_WATCHER_CONTEXT_NAME")) \
                                    .asyncio_watch(self.k8s_watch_configs, k8s_event_handler)
