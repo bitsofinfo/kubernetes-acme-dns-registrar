@@ -4,14 +4,14 @@ You can install this project in a kubernetes cluster with this helm chart.
 
 Please see [values.yaml](values.yaml) for all configurable options.
 
-## Using!
+## Install
 
 ```
 helm repo add bitsofinfo-kubernetes-acme-dns-registrar https://raw.githubusercontent.com/bitsofinfo/kubernetes-acme-dns-registrar/main/helm/repo
 helm repo update
 ```
 
-Using as a dependency:
+Using as a dependency in another chart:
 ```
 # requirements.yaml
 dependencies:
