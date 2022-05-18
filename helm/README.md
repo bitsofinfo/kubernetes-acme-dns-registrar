@@ -7,7 +7,7 @@ Please see [values.yaml](values.yaml) for all configurable options.
 ## Using!
 
 ```
-helm repo add bitsofinfo-kubernetes-acme-dns-registrar https://raw.githubusercontent.com/bitsofinfo/kubernetes-acme-dns-registrar/master/repo
+helm repo add bitsofinfo-kubernetes-acme-dns-registrar https://raw.githubusercontent.com/bitsofinfo/kubernetes-acme-dns-registrar/main/helm/repo
 helm repo update
 ```
 
@@ -17,7 +17,7 @@ Using as a dependency:
 dependencies:
 - name: appdeploy
   version: "<TAG_VERSION>"
-  repository: "https://raw.githubusercontent.com/bitsofinfo/kubernetes-acme-dns-registrar/master/repo"
+  repository: "https://raw.githubusercontent.com/bitsofinfo/kubernetes-acme-dns-registrar/main/helm/repo"
 ```
 
 ## Usage 
