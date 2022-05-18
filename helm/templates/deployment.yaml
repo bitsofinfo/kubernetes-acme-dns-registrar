@@ -44,11 +44,17 @@ spec:
               - key: KADR_DNS_PROVIDER_SECRETS_YAML
                 path: KADR_DNS_PROVIDER_SECRETS_YAML
 
+              {{- if hasKey .Values.acmedns "secretStore" }}
+                {{- if hasKey .Values.acmedns.secretStore "k8sKubeConfig" }}
               - key: KADR_K8S_ACMEDNS_SECRETS_STORE_KUBE_CONFIG
                 path: KADR_K8S_ACMEDNS_SECRETS_STORE_KUBE_CONFIG
+                {{ end }}
+              {{ end }}
 
+              {{- if hasKey .Values.k8swatcher "k8sKubeConfig" }}
               - key: KADR_K8S_WATCHER_KUBE_CONFIG
                 path: KADR_K8S_WATCHER_KUBE_CONFIG
+              {{ end }}
 
       containers:
       - name: kubernetes-acme-dns-registrar

@@ -7,7 +7,7 @@
 
 deployment:
   image: registry.hub.docker.com/bitsofinfo/kubernetes-acme-dns-registrar
-  tag: dev-0.0.0.20220517202536
+  tag: dev-0.0.0.20220518175145
   
 
 #####################################################
@@ -24,8 +24,8 @@ rbac:
   # the RBAC creates a ClusterRole that has permissions
   # to the acme-dns.json secret + the permissions
   # so that k8swatcher can WATCH various kinds of events
-  clusterRoleName: kubernetes-acme-dns-registrar
-  clusterRoleBindingName: kubernetes-acme-dns-registrar
+  k8swatcherClusterRoleName: kubernetes-acme-dns-registrar
+  k8swatcherClusterRoleBindingName: kubernetes-acme-dns-registrar
 
   # the name & namespace of the acme-dns solver secret as
   # configured in cert-manager; this is the secret
@@ -33,6 +33,8 @@ rbac:
   # registrations against acme-dns
   # @ see https://cert-manager.io/docs/configuration/acme/dns01/acme-dns/
   #
+  acmeDnsJsonRoleName: kubernetes-acme-dns-registrar
+  acmeDnsJsonRoleBindingName: kubernetes-acme-dns-registrar
   acmeDnsJsonSecretName: acme-dns
   acmeDnsJsonSecretNamespace: cert-manager
   

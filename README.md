@@ -24,7 +24,6 @@ This project attempts to address the manual steps as described here in the [cert
   - [Docker Run with .env file:](#docker-run-with-env-file)
 - [kubernetes](#kubernetes)
   - [helm chart](#helm-chart)
-  - [kubernetes manifest](#kubernetes-manifest)
 - [API](#api)
 - [local dev](#local-dev)
   - [local run](#local-run)
@@ -206,7 +205,7 @@ docker run \
 This application can be run anywhere, including within kubernetes itself. 
 ## helm chart
 
-## kubernetes manifest
+There is a simple [helm chart](helm) available for installing this project. Please read the [helm chart docs for more details](helm) on how to install and use it.
 # API
 
 Once you start up the registrar, you can access the following endpoints:
