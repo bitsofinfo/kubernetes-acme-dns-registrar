@@ -163,10 +163,10 @@ docker build -t kubernetes-acme-dns-registrar:<your-tag> .
 docker run \
     -p 8000:8000 \
     -v `pwd`/kubeconfig.secret:/opt/scripts/kubeconfig.secret \
-    -v `pwd`/dev.k8s-watcher-config.yaml:/opt/scripts/k8s-watcher-config.yaml \
-    -v `pwd`/dev.acme-dns-config.yaml:/opt/scripts/acme-dns-config.yaml \
-    -v `pwd`/dev.dns-provider-config.yaml:/opt/scripts/dns-provider-config.yaml \
-    -v `pwd`/dev.dns-provider-secrets.yaml:/opt/scripts/dns-provider-secrets.yaml\
+    -v `pwd`/my.k8s-watcher-config.yaml:/opt/scripts/k8s-watcher-config.yaml \
+    -v `pwd`/my.acme-dns-config.yaml:/opt/scripts/acme-dns-config.yaml \
+    -v `pwd`/my.dns-provider-config.yaml:/opt/scripts/dns-provider-config.yaml \
+    -v `pwd`/my.dns-provider-secrets.yaml:/opt/scripts/dns-provider-secrets.yaml\
         \
     -e KADR_K8S_WATCHER_CONFIG_YAML=file@/opt/scripts/k8s-watcher-config.yaml \
     -e KADR_ACME_DNS_CONFIG_YAML=file@/opt/scripts/acme-dns-config.yaml \
@@ -192,10 +192,10 @@ docker run \
     -v `pwd`/.env:/opt/scripts/.env \
         \
     -v `pwd`/kubeconfig.secret:/opt/scripts/kubeconfig.secret \
-    -v `pwd`/dev.k8s-watcher-config.yaml:/opt/scripts/k8s-watcher-config.yaml \
-    -v `pwd`/dev.acme-dns-config.yaml:/opt/scripts/acme-dns-config.yaml \
-    -v `pwd`/dev.dns-provider-config.yaml:/opt/scripts/dns-provider-config.yaml \
-    -v `pwd`/dev.dns-provider-secrets.yaml:/opt/scripts/dns-provider-secrets.yaml \
+    -v `pwd`/my.k8s-watcher-config.yaml:/opt/scripts/k8s-watcher-config.yaml \
+    -v `pwd`/my.acme-dns-config.yaml:/opt/scripts/acme-dns-config.yaml \
+    -v `pwd`/my.dns-provider-config.yaml:/opt/scripts/dns-provider-config.yaml \
+    -v `pwd`/my.dns-provider-secrets.yaml:/opt/scripts/dns-provider-secrets.yaml \
         \
     bitsofinfo/kubernetes-acme-dns-registrar:dev-latest
 ```
@@ -228,10 +228,10 @@ pip install -r requirements-dev.txt
 ## local run
 
 ```bash
-KADR_K8S_WATCHER_CONFIG_YAML=file@`pwd`/dev.k8s-watcher-config.yaml \
-KADR_ACME_DNS_CONFIG_YAML=file@`pwd`/dev.acme-dns-config.yaml \
-KADR_DNS_PROVIDER_CONFIG_YAML=file@`pwd`/dev.dns-provider-config.yaml \
-KADR_DNS_PROVIDER_SECRETS_YAML=file@`pwd`/dev.dns-provider-secrets.yaml \
+KADR_K8S_WATCHER_CONFIG_YAML=file@`pwd`/my.k8s-watcher-config.yaml \
+KADR_ACME_DNS_CONFIG_YAML=file@`pwd`/my.acme-dns-config.yaml \
+KADR_DNS_PROVIDER_CONFIG_YAML=file@`pwd`/my.dns-provider-config.yaml \
+KADR_DNS_PROVIDER_SECRETS_YAML=file@`pwd`/my.dns-provider-secrets.yaml \
 KADR_JWT_SECRET_KEY=123 \
 KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
 KADR_K8S_WATCHER_CONTEXT_NAME=my-k8s-context \

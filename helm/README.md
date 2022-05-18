@@ -26,26 +26,25 @@ dependencies:
 
 See what it will output:
 ```
-helm template kubernetes-acme-dns-registrar . \
-    --values values.yaml \
-    --debug \
-    --set-file acmedns.configYaml=../dev.acme-dns-config.yaml \
-    --set-file k8swatcher.configYaml=../dev.k8s-watcher-config.yaml \
-    --set-file dnsproviders.configYaml=../dev.dns-provider-config.yaml \
-    --set-file dnsproviders.secretsYaml=../dev.dns-provider-secrets.yaml \
+helm template kubernetes-acme-dns-registrar \
+    bitsofinfo-kubernetes-acme-dns-registrar/kubernetes-acme-dns-registrar \
+    --set-file acmedns.configYaml=my.acme-dns-config.yaml \
+    --set-file k8swatcher.configYaml=my.k8s-watcher-config.yaml \
+    --set-file dnsproviders.configYaml=my.dns-provider-config.yaml \
+    --set-file dnsproviders.secretsYaml=my.dns-provider-secrets.yaml \
     --set api.jwtSecretKey='1234$kadr@*j_dummykey' 
 ```
 
 
 Install/upgrade
 ```
-helm [install|upgrade] kubernetes-acme-dns-registrar . \
+helm [install|upgrade] kubernetes-acme-dns-registrar kubernetes-acme-dns-registrar \
     --values values.yaml \
     --debug \
-    --set-file acmedns.configYaml=../dev.acme-dns-config.yaml \
-    --set-file k8swatcher.configYaml=../dev.k8s-watcher-config.yaml \
-    --set-file dnsproviders.configYaml=../dev.dns-provider-config.yaml \
-    --set-file dnsproviders.secretsYaml=../dev.dns-provider-secrets.yaml \
+    --set-file acmedns.configYaml=../my.acme-dns-config.yaml \
+    --set-file k8swatcher.configYaml=../my.k8s-watcher-config.yaml \
+    --set-file dnsproviders.configYaml=../my.dns-provider-config.yaml \
+    --set-file dnsproviders.secretsYaml=../my.dns-provider-secrets.yaml \
     --set api.jwtSecretKey='1234$kadr@*j_dummykey' \
     --namespace cert-manager
 ```
@@ -55,4 +54,33 @@ helm [install|upgrade] kubernetes-acme-dns-registrar . \
 ```
 helm package . -d repo/charts/
 helm repo index repo/
+```
+
+## local dev
+
+
+See what it will output:
+```
+helm template kubernetes-acme-dns-registrar . \
+    --values values.yaml \
+    --debug \
+    --set-file acmedns.configYaml=../my.acme-dns-config.yaml \
+    --set-file k8swatcher.configYaml=../my.k8s-watcher-config.yaml \
+    --set-file dnsproviders.configYaml=../my.dns-provider-config.yaml \
+    --set-file dnsproviders.secretsYaml=../my.dns-provider-secrets.yaml \
+    --set api.jwtSecretKey='1234$kadr@*j_dummykey' 
+```
+
+
+Install/upgrade
+```
+helm [install|upgrade] kubernetes-acme-dns-registrar . \
+    --values values.yaml \
+    --debug \
+    --set-file acmedns.configYaml=../my.acme-dns-config.yaml \
+    --set-file k8swatcher.configYaml=../my.k8s-watcher-config.yaml \
+    --set-file dnsproviders.configYaml=../my.dns-provider-config.yaml \
+    --set-file dnsproviders.secretsYaml=../my.dns-provider-secrets.yaml \
+    --set api.jwtSecretKey='1234$kadr@*j_dummykey' \
+    --namespace cert-manager
 ```
