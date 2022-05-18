@@ -1,0 +1,54 @@
+{{ $_ := required "service.name is REQUIRED!" .Values.service.name }}
+{{ $_ := required "service.type is REQUIRED!" .Values.service.type }}
+{{ $_ := required "service.port is REQUIRED!" .Values.service.port }}
+
+{{- $_ := set . "stdlabelsargs" (dict "root" $) }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ .Release.Name }}
+
+  labels:
+    {{ include "kadr.stdlabels" $.stdlabelsargs | indent 4 }}
+
+    {{ if .Values.ingress.metadata.labels }}
+      {{- range $labelName,$labelValue := .root.Values.ingress.metadata.labels }}
+    "{{ $labelName }}": "{{ $labelValue }}"
+      {{- end }}
+    {{ end }}
+
+  annotations:
+    {{ if eq .Values.ingress.targetPort.tls true }}
+    ingress.kubernetes.io/protocol: "https"
+    {{ else }}
+    ingress.kubernetes.io/protocol: "http"
+    {{ end }}
+
+    {{ if .Values.ingress.metadata.annotations }}
+      {{- range $annotationName,$annotationValue := .Values.ingress.metadata.annotations }}
+    "{{ $annotationName }}": "{{ $annotationValue }}"
+      {{- end }}
+    {{ end }}
+
+spec:
+
+  {{ if .Values.ingress.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.hostnameFqdn }}
+    secretName: {{ .root.Values.ingress.tls.secretName }}
+  {{ end }}
+  rules:
+  - host: {{ .Values.ingress.hostnameFqdn }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Values.service.name }}
+            port:
+              number: {{ .Values.service.port.port }}
+        pathType: ImplementationSpecific
+

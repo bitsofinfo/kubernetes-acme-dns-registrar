@@ -1,0 +1,26 @@
+{{ $_ := required "service.name is REQUIRED!" .Values.service.name }}
+{{ $_ := required "service.type is REQUIRED!" .Values.service.type }}
+{{ $_ := required "service.port is REQUIRED!" .Values.service.port }}
+
+{{- $_ := set . "stdlabelsargs" (dict "root" $) }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.service.name }}"
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{ include "kadr.stdlabels" $.stdlabelsargs | indent 4 }}
+    {{- range $label := .Values.service.labels }}
+    "{{ $label.name }}": "{{ $label.value }}"
+    {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ .Release.Name }}
+  type: {{ .Values.service.type }}
+  ports:
+    - protocol: TCP
+      name: {{ .Values.service.port.name }}
+      port: {{ .Values.service.port.port }}
+      targetPort: {{ .Values.service.port.targetPort }}

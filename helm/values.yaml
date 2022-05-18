@@ -9,6 +9,57 @@ deployment:
   image: registry.hub.docker.com/bitsofinfo/kubernetes-acme-dns-registrar
   tag: dev-0.0.0.20220518175145
   
+#####################################################
+#
+# Basic k8s Service configuration
+#
+#####################################################
+service:
+  enabled: false
+  name: kubernetes-acme-dns-registrar
+  type: ClusterIP
+  port:
+    name: kubernetes-acme-dns-registrar-8000
+    port: 8000
+    targetPort: 8000
+
+  # tpl variable substitution supported in values here. See README
+  # Note these are "extra" labels in addition to auto-generated standard
+  # labels that are applied to all chart objects
+  labels: []
+  #  - name: "label-name"
+  #    value: "label value" 
+
+#####################################################
+#
+# Basic k8s Ingress configuration
+#
+#####################################################
+ingress:
+  enabled: false
+  name: kubernetes-acme-dns-registrar
+
+  # the hostname of this ingress
+  hostnameFqdn: "kadr.local"
+
+  # if the kubernetes-acme-dns-registrar service port
+  # that the ingress will forward traffic to is exposing TLS
+  targetPort:
+    tls: false
+
+  tls:
+    enabled: false
+    secretName: "" # you need to set this!
+
+  metadata:
+    labels:
+      #"label/name1": "something" 
+      #labelName2: "something" 
+    annotations:
+      "kubernetes.io/ingress.class": YOUR_INGRESS_CLASS_HERE
+      "cert-manager.io/cluster-issuer": YOUR_CERT_MGR_ISSUER_NAME_HERE
+      #"annotation/name1": "something" 
+      #annotationName2: "something"
 
 #####################################################
 #
