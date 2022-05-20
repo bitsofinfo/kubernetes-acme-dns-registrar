@@ -4,6 +4,8 @@ You can install this project in a kubernetes cluster with this helm chart.
 
 Please see [values.yaml](values.yaml) for all configurable options.
 
+Note that this chart also can (optionally) provision a `Service` and `Ingress` so that you can access the kubernetes-acme-dns-registrar's API.. however this is DISABLED by default. Again see see [values.yaml](values.yaml) for options.
+
 ## Install
 
 ```
