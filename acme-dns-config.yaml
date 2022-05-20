@@ -37,5 +37,9 @@ zone_configs:
     # even if it matches an includes above
     excludes: null
 
+    # set of allow from IP ranges when creating 
+    # new registrations (i.e. 10.11.12.0/24)
+    allowfrom: []
+
     # the acme-dns registration URL
     acme_dns_registration_url: http://auth.my-domain.net/register

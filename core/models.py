@@ -25,7 +25,7 @@ class AcmeDnsRegistration(BaseModel):
     password:str
     fulldomain:str
     subdomain:str
-    allowFrom:Optional[List[str]]
+    allowfrom:Optional[List[str]]
 
 class Registration(BaseModel):
     created_at:datetime

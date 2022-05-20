@@ -263,8 +263,6 @@ https://github.com/bitsofinfo/k8swatcher
 
 # TODO
 
-* implement basic IDP impl for api creds
-* implement `allowFrom` support for acme-dns registrations
 * more robust implementation of `RegistrationStore` (i.e. sqllite etc)
 * configuration of `k8s.py` `K8sKindHostExtractor's` per watcher config, currently assumed Ingress
 

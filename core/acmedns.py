@@ -84,11 +84,21 @@ class ACMEDnsRegistrar(Thread):
                     zone_config = self.get_zone_config(domain_name_event.domain_name)
                     acme_dns_registration_url = zone_config["acme_dns_registration_url"]
                     acme_dns_registration_url = zone_config["acme_dns_registration_url"]
-                    acme_dns_registration_response = requests.post(acme_dns_registration_url, data=None, timeout=30)
 
-                    self.logger.debug(f"run() POSTed registration @ {acme_dns_registration_url} for {domain_name_event.domain_name} OK")
+                    register_data = None
+                    if 'allowfrom' in zone_config and zone_config['allowfrom'] and len(zone_config['allowfrom']) > 0:
+                        register_data = { "allowfrom" : zone_config['allowfrom'] }
 
+                    acme_dns_registration_response = requests.post(url=acme_dns_registration_url, json=register_data, timeout=30)
 
+                    self.logger.debug(f"run() POSTed registration @ {acme_dns_registration_url} for {domain_name_event.domain_name}, register_data: {simplejson.dumps(register_data)} OK")
+
+                    response = acme_dns_registration_response.json()
+                    if 'error' in response:
+                        msg = f"run() error returned from {acme_dns_registration_url} {simplejson.dumps(response)}"
+                        self.logger.debug(msg)
+                        raise Exception(msg)
+                    
                     acme_dns_registration:AcmeDnsRegistration = \
                             AcmeDnsRegistration(**acme_dns_registration_response.json())
 

@@ -66,7 +66,7 @@ class DefaultIdpService(IdpService):
 
                 digest = self.hasher.hexdigest()
 
-                if principal["secretHash"] != self.hasher.hexdigest():
+                if principal["secretHash"] != digest:
                     raise Exception("authenticate_principal() Invalid credentials: 002")
 
                 return True
