@@ -42,6 +42,9 @@ ingress:
   # the hostname of this ingress
   hostnameFqdn: "kadr.local"
 
+  # https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types
+  pathType: Prefix
+
   # if the kubernetes-acme-dns-registrar service port
   # that the ingress will forward traffic to is exposing TLS
   targetPort:

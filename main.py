@@ -130,7 +130,9 @@ async def get_authorized_principal(request:Request) -> AuthorizedPrincipal:
                 headers=headers
             )
 
-
+@app.get("/registrations")
+async def get_registrations(invoking_principal:AuthorizedPrincipal=Depends(get_authorized_principal)):
+    return await get_registrations(None,invoking_principal)
 
 @app.get("/registrations/{name:path}")
 async def get_registrations(name:Optional[str], \

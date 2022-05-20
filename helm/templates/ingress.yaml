@@ -45,10 +45,11 @@ spec:
   - host: {{ .Values.ingress.hostnameFqdn }}
     http:
       paths:
-      - backend:
+      - path: /
+        backend:
           service:
             name: {{ .Values.service.name }}
             port:
               number: {{ .Values.service.port.port }}
-        pathType: ImplementationSpecific
+        pathType: {{ .Values.ingress.pathType }}
 
