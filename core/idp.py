@@ -40,8 +40,6 @@ class DefaultIdpService(IdpService):
         self.principal_db = self.settings.get_from_yaml("KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML")
         self.principals:dict = self.principal_db["principals"]
 
-        self.hasher = hashlib.sha3_512()
-
         self.logger = LogService(__file__).logger
 
 
@@ -62,9 +60,9 @@ class DefaultIdpService(IdpService):
 
                 principal = self.principals[principal_id]
 
-                self.hasher.update(secret.strip().encode("utf8"))
-
-                digest = self.hasher.hexdigest()
+                hasher = hashlib.sha3_512()
+                hasher.update(secret.strip().encode("utf8"))
+                digest = hasher.hexdigest()
 
                 if principal["secretHash"] != digest:
                     raise Exception("authenticate_principal() Invalid credentials: 002")

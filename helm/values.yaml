@@ -7,7 +7,7 @@
 
 deployment:
   image: registry.hub.docker.com/bitsofinfo/kubernetes-acme-dns-registrar
-  tag: dev-0.0.0.20220520174138
+  tag: dev-0.0.0.20220520223239
   
 #####################################################
 #
