@@ -216,6 +216,8 @@ Once you start up the registrar, you can access the following endpoints:
 
 http://localhost:8000/docs
 
+See [the postman collection](postman) for sample requests:
+
 * `GET /health` - FastAPI healthcheck endpoint
 * `GET /docs` - FastAPI swagger docs
 * `POST /oauth2/token` - Acquire an OAuth2 `client_credentials` grant token (username/pw basic auth OR via `client_id/client_secret` FORM post params) By default the database of principals that you can configure to feed the underlying [DefaultIdpService](core/idp.py) is configured by the [idp-principal-db-config.yaml](idp-principal-db-config.yaml).
