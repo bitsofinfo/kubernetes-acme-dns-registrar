@@ -1,0 +1,18 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The contents of this file or a pointer to this file should
+# be set to the ENV variable:
+#
+# KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML=[yaml | file@/path/reference]
+#
+# used by @core/idp.py
+#
+# echo -n 'secret$1' | openssl dgst -sha3-512
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+principals:
+  admin:
+    # default secret$1
+    secretHash: 64f1e3374f34536c8c82873cf910d0eeb6d3cb0e0002b24a5402cd3989ab3b4e810895368348051c9241f141f1625c63ed5fbd4a0c5d17a5a33e4af43c49dcaa
+  #joe:
+    #secretHash: <hex encoded SHA3-512 hash/digest>  

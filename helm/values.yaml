@@ -102,7 +102,12 @@ rbac:
 
 #api:
   # the jwt secret key that will be used when signing JWT tokens
+  # for the API
   #jwtSecretKey: FILLMEIN!
+
+  # for the DefaultIdpService configuration
+  #idp:
+    #principalDbConfigYaml: RAW YAML CONTENTS | pass via --set-file x.y=/path/to/file
 
 #####################################################
 #

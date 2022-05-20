@@ -115,12 +115,13 @@ See [settings.py](core/settings.py) for more info (which is based off of [pydant
 
 * `KADR_ACME_DNS_CONFIG_YAML`: YAML string literal config or file reference: `file@/path/to/acme-dns-config.yaml` This is the YAML configuration that drives the behavior [of the ACMEDnsRegistrar](core/acmedns.py) See the [acme-dns-config.yaml example config file](acme-dns-config.yaml)
 
-
 * `KADR_DNS_PROVIDER_CONFIG_YAML`: YAML string literal config or file reference: `file@/path/to/dns-provider-config.yaml` This is the YAML configuration that drives the behavior of the supported [dnsproviders you want to enable](core/dnsprovider) See the [dns-provider-config.yaml example config file](dns-provider-config.yaml)
 
 * `KADR_DNS_PROVIDER_SECRETS_YAML`: YAML string literal config or file reference: `file@/path/to/dns-provider-secrets.yaml` This is the YAML configuration that configures any secrets for the supported [dnsproviders you want to enable](core/dnsprovider) See the [dns-provider-secrets.yaml example config file](dns-provider-secrets.yaml)
 
 * `KADR_JWT_SECRET_KEY`: string literal config or file reference: `file@/path/to/jwtsecret`. This is the secret key (i.e. string password/value) that will be used by the underlying JWT token signing code that secures the API
+
+* `KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML`: string literal config or file reference: `file@/path/to/idp-principal-db-config.yaml`. This contains the principal/secrets database that secures the `API` used by the `DefaultIdpService`. See the [idp-principal-db-config.yaml example config file](idp-principal-db-config.yaml)
 
 ### optional k8s specific ENV variables
 
@@ -166,12 +167,14 @@ docker run \
     -v `pwd`/my.k8s-watcher-config.yaml:/opt/scripts/k8s-watcher-config.yaml \
     -v `pwd`/my.acme-dns-config.yaml:/opt/scripts/acme-dns-config.yaml \
     -v `pwd`/my.dns-provider-config.yaml:/opt/scripts/dns-provider-config.yaml \
-    -v `pwd`/my.dns-provider-secrets.yaml:/opt/scripts/dns-provider-secrets.yaml\
+    -v `pwd`/my.dns-provider-secrets.yaml:/opt/scripts/dns-provider-secrets.yaml \
+    -v `pwd`/my.idp-principal-db-config.yaml:/opt/scripts/idp-principal-db-config.yaml \
         \
     -e KADR_K8S_WATCHER_CONFIG_YAML=file@/opt/scripts/k8s-watcher-config.yaml \
     -e KADR_ACME_DNS_CONFIG_YAML=file@/opt/scripts/acme-dns-config.yaml \
     -e KADR_DNS_PROVIDER_CONFIG_YAML=file@/opt/scripts/dns-provider-config.yaml \
     -e KADR_DNS_PROVIDER_SECRETS_YAML=file@/opt/scripts/dns-provider-secrets.yaml \
+    -e KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML=file@/opt/scripts/idp-principal-db-config.yaml \
     -e KADR_JWT_SECRET_KEY=123 \
     -e KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
     -e KADR_K8S_WATCHER_CONTEXT_NAME=my-k8s-context \
@@ -196,6 +199,7 @@ docker run \
     -v `pwd`/my.acme-dns-config.yaml:/opt/scripts/acme-dns-config.yaml \
     -v `pwd`/my.dns-provider-config.yaml:/opt/scripts/dns-provider-config.yaml \
     -v `pwd`/my.dns-provider-secrets.yaml:/opt/scripts/dns-provider-secrets.yaml \
+    -v `pwd`/my.idp-principal-db-config.yaml:/opt/scripts/idp-principal-db-config.yaml \
         \
     bitsofinfo/kubernetes-acme-dns-registrar:dev-latest
 ```
@@ -214,7 +218,7 @@ http://localhost:8000/docs
 
 * `GET /health` - FastAPI healthcheck endpoint
 * `GET /docs` - FastAPI swagger docs
-* `POST /oauth2/token` - Acquire an OAuth2 `client_credentials` grant token (username/pw basic auth OR via `client_id/client_secret` FORM post params)
+* `POST /oauth2/token` - Acquire an OAuth2 `client_credentials` grant token (username/pw basic auth OR via `client_id/client_secret` FORM post params) By default the database of principals that you can configure to feed the underlying [DefaultIdpService](core/idp.py) is configured by the [idp-principal-db-config.yaml](idp-principal-db-config.yaml).
 * `GET /registrations[/{name}]` - View the registrar's `Registration` database records
 
 # local dev
@@ -232,6 +236,7 @@ KADR_K8S_WATCHER_CONFIG_YAML=file@`pwd`/my.k8s-watcher-config.yaml \
 KADR_ACME_DNS_CONFIG_YAML=file@`pwd`/my.acme-dns-config.yaml \
 KADR_DNS_PROVIDER_CONFIG_YAML=file@`pwd`/my.dns-provider-config.yaml \
 KADR_DNS_PROVIDER_SECRETS_YAML=file@`pwd`/my.dns-provider-secrets.yaml \
+KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML=file@`pwd`/my.idp-principal-db-config.yaml \
 KADR_JWT_SECRET_KEY=123 \
 KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH=/opt/scripts/kubeconfig.secret \
 KADR_K8S_WATCHER_CONTEXT_NAME=my-k8s-context \

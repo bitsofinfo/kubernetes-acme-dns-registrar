@@ -31,6 +31,9 @@ class OAuth2ErrorType(str, Enum):
     UNAUTHORIZED_CLIENT = 'unauthorized_client'
     UNSUPPORTED_GRANT_TYPE = 'unsupported_grant_type'
 
+    def __str__(self):
+        str(self.value)
+
 class OAuth2TokenClientCredentialsRequest(BaseModel):
     scope:Optional[str]
     grant_type:OAuth2GrantType = OAuth2GrantType.CLIENT_CREDENTIALS
@@ -106,8 +109,9 @@ class OAuth2Service():
                 await self.idp_service.authenticate_principal(oauth2_token_payload.client_id, \
                                                               oauth2_token_payload.client_secret)
             except Exception as e:
-                logger.error(f"process_token_request() idp_service.authenticate_principal() {oauth2_token_payload.client_id}: {str(sys.exc_info()[:2])}")
-                return OAuth2ErrorResponse(error=OAuth2ErrorType.UNAUTHORIZED_CLIENT,error_description=e)
+                msg = str(sys.exc_info()[:2])
+                logger.error(f"process_token_request() idp_service.authenticate_principal() {oauth2_token_payload.client_id}: {msg}")
+                return OAuth2ErrorResponse(error=OAuth2ErrorType.UNAUTHORIZED_CLIENT,error_description=msg)
 
             jwt_payload:JWTPayload = await self.jwt_service.get_jwt_payload(subject_id=oauth2_token_payload.client_id,\
                                                                         issuer_id=issuer_id,\

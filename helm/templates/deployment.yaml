@@ -56,6 +56,10 @@ spec:
                 path: KADR_K8S_WATCHER_KUBE_CONFIG
               {{ end }}
 
+              - key: KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML
+                path: KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML
+
+
       containers:
       - name: kubernetes-acme-dns-registrar
         image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
@@ -83,6 +87,9 @@ spec:
 
           - name: KADR_JWT_SECRET_KEY
             value: "file@/opt/secrets/KADR_JWT_SECRET_KEY"
+
+          - name: KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML
+            value: "file@/opt/configs/KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML"     
 
           {{- if hasKey .Values.k8swatcher "k8sKubeConfig" }}
           - name: KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH
