@@ -4,6 +4,8 @@
 
 {{- $_ := set . "stdlabelsargs" (dict "root" $) }}
 
+
+{{ if eq .Values.service.enabled true }}
 ---
 apiVersion: v1
 kind: Service
@@ -24,3 +26,5 @@ spec:
       name: {{ .Values.service.port.name }}
       port: {{ .Values.service.port.port }}
       targetPort: {{ .Values.service.port.targetPort }}
+
+{{ end }}

@@ -4,6 +4,8 @@
 
 {{- $_ := set . "stdlabelsargs" (dict "root" $) }}
 
+
+{{ if eq .Values.ingress.enabled true }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -53,3 +55,4 @@ spec:
               number: {{ .Values.service.port.port }}
         pathType: {{ .Values.ingress.pathType }}
 
+{{ end }}
