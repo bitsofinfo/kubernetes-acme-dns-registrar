@@ -77,11 +77,13 @@ spec:
         env:
           - name: KADR_K8S_WATCHER_CONFIG_YAML
             value: "file@/opt/configs/KADR_K8S_WATCHER_CONFIG_YAML"
+
           - name: KADR_ACME_DNS_CONFIG_YAML
             value: "file@/opt/configs/KADR_ACME_DNS_CONFIG_YAML"
 
           - name: KADR_DNS_PROVIDER_CONFIG_YAML
             value: "file@/opt/configs/KADR_DNS_PROVIDER_CONFIG_YAML"
+
           - name: KADR_DNS_PROVIDER_SECRETS_YAML
             value : "file@/opt/secrets/KADR_DNS_PROVIDER_SECRETS_YAML"
 
@@ -89,7 +91,7 @@ spec:
             value: "file@/opt/secrets/KADR_JWT_SECRET_KEY"
 
           - name: KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML
-            value: "file@/opt/configs/KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML"     
+            value: "file@/opt/secrets/KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML"     
 
           {{- if hasKey .Values.k8swatcher "k8sKubeConfig" }}
           - name: KADR_K8S_WATCHER_KUBE_CONFIG_FILE_PATH
