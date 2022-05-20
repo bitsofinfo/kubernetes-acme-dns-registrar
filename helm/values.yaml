@@ -52,12 +52,11 @@ ingress:
     secretName: "" # you need to set this!
 
   metadata:
-    labels:
+    #labels:
       #"label/name1": "something" 
       #labelName2: "something" 
     annotations:
       "kubernetes.io/ingress.class": YOUR_INGRESS_CLASS_HERE
-      "cert-manager.io/cluster-issuer": YOUR_CERT_MGR_ISSUER_NAME_HERE
       #"annotation/name1": "something" 
       #annotationName2: "something"
 

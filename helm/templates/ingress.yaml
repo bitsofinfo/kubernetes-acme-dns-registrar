@@ -15,7 +15,7 @@ metadata:
     {{ include "kadr.stdlabels" $.stdlabelsargs | indent 4 }}
 
     {{ if .Values.ingress.metadata.labels }}
-      {{- range $labelName,$labelValue := .root.Values.ingress.metadata.labels }}
+      {{- range $labelName,$labelValue := .Values.ingress.metadata.labels }}
     "{{ $labelName }}": "{{ $labelValue }}"
       {{- end }}
     {{ end }}
@@ -39,7 +39,7 @@ spec:
   tls:
   - hosts:
     - {{ .Values.ingress.hostnameFqdn }}
-    secretName: {{ .root.Values.ingress.tls.secretName }}
+    secretName: {{ .Values.ingress.tls.secretName }}
   {{ end }}
   rules:
   - host: {{ .Values.ingress.hostnameFqdn }}

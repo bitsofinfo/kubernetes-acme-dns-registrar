@@ -67,7 +67,12 @@ helm template kubernetes-acme-dns-registrar . \
     --set-file k8swatcher.configYaml=../my.k8s-watcher-config.yaml \
     --set-file dnsproviders.configYaml=../my.dns-provider-config.yaml \
     --set-file dnsproviders.secretsYaml=../my.dns-provider-secrets.yaml \
-    --set api.jwtSecretKey='1234$kadr@*j_dummykey' 
+    --set api.jwtSecretKey='1234$kadr@*j_dummykey' \
+    --set ingress.hostnameFqdn=my-kadr.mydomain.net \
+    --set ingress.tls.enabled=true \
+    --set ingress.tls.secretName=my-kadr-mydomain-net \
+    --set ingress.metadata.annotations.kubernetes\\.io/ingress\\.class=my-ingress-class \
+    --set ingress.metadata.labels.my-label=test
 ```
 
 
