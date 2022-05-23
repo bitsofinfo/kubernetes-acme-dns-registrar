@@ -4,7 +4,9 @@
 #
 # KADR_DEFAULT_IDP_PRINCIPAL_DB_CONFIG_YAML=[yaml | file@/path/reference]
 #
-# used by @core/idp.py
+# used by @core/idp.py which is what is consulted for oauth2 
+# client credentials based authentications to the /oauth2/token API
+# of the registrar
 #
 # echo -n 'secret$1' | openssl dgst -sha3-512
 #
