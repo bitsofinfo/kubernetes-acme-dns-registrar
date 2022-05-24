@@ -22,11 +22,17 @@ class K8sKindHostExtractor(ABC):
 
 class K8sIngressHostsExtractor(K8sKindHostExtractor):
 
+    def __init__(self,):
+        self.logger = LogService("K8sIngressHostsExtractor").logger
+
     def extract_hosts(self, k8s_object) -> List[str]:
         # capture hosts from tls block
         hosts = []
-        for tls in k8s_object["spec"]["tls"]:
-            hosts.extend(tls["hosts"])
+        if "tls" in k8s_object["spec"]:
+            for tls in k8s_object["spec"]["tls"]:
+                hosts.extend(tls["hosts"])
+        else:
+            self.logger.debug(f"extract_hosts() no spec.tls found in Ingress: name={k8s_object['metadata']['name']}")
         return hosts
 
 
@@ -53,5 +59,7 @@ class DomainNameEventCreator(K8sEventHandler):
                     "source_data": k8s_watch_event_dict
                 }))
 
+                self.logger.debug(f"handle_k8s_watch_event() pushed event for host: {host}")
+
         except Exception as e:
-            self.logger.exception(f"DomainNameEventCreator().handle_k8s_watch_event() unexpected error: {str(sys.exc_info()[:2])}")
+            self.logger.exception(f"handle_k8s_watch_event() unexpected error: {str(sys.exc_info()[:2])}")
