@@ -54,6 +54,10 @@ class ACMEDnsRegistrar(Thread):
         for name,reg in all_acme_dns_registrations.items():
             acme_dns_registration_secret_data[name] = reg.acme_dns_registration.dict()
 
+            # create second entry w/ *. stripped for wildcards
+            if name.startswith('*.'):
+                acme_dns_registration_secret_data[name.replace('*.','')] = reg.acme_dns_registration.dict()
+
         await self.acme_dns_k8s_secret_store.put_acme_dns_registrations_k8s_secret_data(acme_dns_registration_secret_data)
 
     async def do_processing(self):
