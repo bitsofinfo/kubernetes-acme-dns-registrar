@@ -3,7 +3,7 @@ entries:
   kubernetes-acme-dns-registrar:
   - apiVersion: v1
     appVersion: 0.0.1
-    created: "2022-06-01T13:41:56.291674-06:00"
+    created: "2022-06-09T08:28:19.835562-06:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: 97bb26ea01d484de0e03fe0c1d8504e0dffa46c3c24efb666ab6bd16a8f7e14d
     name: kubernetes-acme-dns-registrar
@@ -11,8 +11,17 @@ entries:
     - charts/kubernetes-acme-dns-registrar-0.0.1.tgz
     version: 0.0.1
   - apiVersion: v1
+    appVersion: 0.0.1-e
+    created: "2022-06-09T08:28:19.828075-06:00"
+    description: Chart for installing kubernetes-acme-dns-registrar
+    digest: 7e07d552157e5670ecc3bd7aea99ad6bdcd0fbddef3ea930f7e224fa50fff787
+    name: kubernetes-acme-dns-registrar
+    urls:
+    - charts/kubernetes-acme-dns-registrar-0.0.1-e.tgz
+    version: 0.0.1-e
+  - apiVersion: v1
     appVersion: 0.0.1-d
-    created: "2022-06-01T13:41:56.29081-06:00"
+    created: "2022-06-09T08:28:19.827454-06:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: 0bbaf821805c6338d249466ec38d35bd5d02b1be79069a2fbfdd8bede9c678ae
     name: kubernetes-acme-dns-registrar
@@ -21,7 +30,7 @@ entries:
     version: 0.0.1-d
   - apiVersion: v1
     appVersion: 0.0.1-c
-    created: "2022-06-01T13:41:56.290184-06:00"
+    created: "2022-06-09T08:28:19.826316-06:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: cd2a4590e2ad54f67b7f72204bc2ff22196ad8dad837976026cd79c497048a80
     name: kubernetes-acme-dns-registrar
@@ -30,11 +39,11 @@ entries:
     version: 0.0.1-c
   - apiVersion: v1
     appVersion: 0.0.1-b
-    created: "2022-06-01T13:41:56.288718-06:00"
+    created: "2022-06-09T08:28:19.824929-06:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: 11589a74e5470fe405f61238f6d5ada538432041ba40c0fbc79e0295f89536f3
     name: kubernetes-acme-dns-registrar
     urls:
     - charts/kubernetes-acme-dns-registrar-0.0.1-b.tgz
     version: 0.0.1-b
-generated: "2022-06-01T13:41:56.287005-06:00"
+generated: "2022-06-09T08:28:19.811619-06:00"
