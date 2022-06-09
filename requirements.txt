@@ -10,7 +10,7 @@ python-multipart==0.0.5
 simplejson==3.17.6
 requests==2.27.1
 
-k8swatcher==0.0.3
+k8swatcher==0.0.4
 
 azure-mgmt-dns==8.0.0
 azure-mgmt-privatedns==1.0.0
