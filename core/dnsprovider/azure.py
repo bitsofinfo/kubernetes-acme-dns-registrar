@@ -13,63 +13,18 @@ import simplejson
 from ..logging import LogService
 from re import Pattern
 import re
-from ..settings import SmartSettings
 from ..utils import *
-from . import DnsProvider, EnsureCNAMEResult
+from . import BaseDnsProvider, DnsProvider, DnsProviderSettings, EnsureCNAMEResult
 from abc import ABC, abstractmethod
 import sys
-class DnsProviderSettings(SmartSettings):
-    KADR_DNS_PROVIDER_CONFIG_YAML:str
-    KADR_DNS_PROVIDER_SECRETS_YAML:str
 
-class BaseAzureDnsProvider(DnsProvider):
+class BaseAzureDnsProvider(BaseDnsProvider):
 
-    def __init__(self):
+    def post_config_init(self):
 
-        # we are only enabled if we have an entry in the dns-provider config YAML we load
-        self.enabled = False
-
-        self.logger = LogService(f"BaseAzureDnsProvider {self.get_dns_provider_name()}").logger
-
-        self.init_config()
-
-        if self.is_enabled():
-            self.init_dns_client()
-    
-    def init_config(self):
-        self.settings = DnsProviderSettings()
-
-        all_dns_provider_configs = self.settings.get_from_yaml("KADR_DNS_PROVIDER_CONFIG_YAML")["dns_providers"]
-
-        # not enabled
-        if self.get_dns_provider_name() not in all_dns_provider_configs:
-            self.enabled = False
-            return
-
-        self.logger.debug(f"AzureDnsProvider {self.get_dns_provider_name()} enabled")
-        self.enabled = True
-
-        self.dns_provider_config = all_dns_provider_configs[self.get_dns_provider_name()]
-        dns_provider_secrets =self.settings.get_from_yaml("KADR_DNS_PROVIDER_SECRETS_YAML")["dns_providers"][self.get_dns_provider_name()]
-   
-        # merge them
-        self.dns_provider_config.update(dns_provider_secrets)
-
-        # copy all common settings into each zone level config (only if not overridden)
-        for zone,zone_config in self.dns_provider_config["zones"].items():
-            if "client_secret" not in zone_config:
-                zone_config["client_secret"] = self.dns_provider_config["client_secret"]
-            if "client_id" not in zone_config:
-                zone_config["client_id"] = self.dns_provider_config["client_id"]
-            if "tenant_id" not in zone_config:
-                zone_config["tenant_id"] = self.dns_provider_config["tenant_id"]
-            if "subscription_id" not in zone_config:
-                zone_config["subscription_id"] = self.dns_provider_config["subscription_id"]
-
-        self.zone_configs = self.dns_provider_config["zones"]
-
-        re_compile_patterns(self.zone_configs,["includes","excludes"])
-
+        # TODO: this cred is not properly being overriden
+        # per target zone.... per the configuration... this
+        # one is being using regardless of zone
         self.credentials = ClientSecretCredential(
             tenant_id=self.dns_provider_config["tenant_id"],
             client_id=self.dns_provider_config["client_id"],
@@ -78,8 +33,13 @@ class BaseAzureDnsProvider(DnsProvider):
 
         self.subscription_id = self.dns_provider_config["subscription_id"]
 
-    def get_zone_config(self, domain_name):
-        return find_config(self.zone_configs, domain_name)
+        if self.is_enabled():
+            self.init_dns_client()
+
+
+    def get_overridable_prop_names(self):
+        return ["client_secret","client_id","tenant_id","subscription_id"]
+
 
     @abstractmethod
     def init_dns_client(self):
