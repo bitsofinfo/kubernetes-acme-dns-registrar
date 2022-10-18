@@ -22,32 +22,35 @@ class BaseAzureDnsProvider(BaseDnsProvider):
 
     def post_config_init(self):
 
-        # TODO: this cred is not properly being overriden
-        # per target zone.... per the configuration... this
-        # one is being using regardless of zone
-        self.credentials = ClientSecretCredential(
-            tenant_id=self.dns_provider_config["tenant_id"],
-            client_id=self.dns_provider_config["client_id"],
-            client_secret=self.dns_provider_config["client_secret"]
-        )
-
-        self.subscription_id = self.dns_provider_config["subscription_id"]
-
         if self.is_enabled():
-            self.init_dns_client()
+
+            self.zone_clients = {}
+
+            for zone_name in self.zone_configs.keys():
+                zone_config = self.zone_configs[zone_name]
+
+                subscription_id = zone_config["subscription_id"]
+
+                zone_credential = ClientSecretCredential(
+                                        tenant_id=zone_config["tenant_id"],
+                                        client_id=zone_config["client_id"],
+                                        client_secret=zone_config["client_secret"]
+                                    )
+
+                self.zone_clients[zone_name] = self.create_dns_client(zone_credential,subscription_id)
+
+                self.logger.debug(f"post_config_init() {self.get_dns_provider_name()} configured Azure client for zone {zone_name}")
 
 
     def get_overridable_prop_names(self):
         return ["client_secret","client_id","tenant_id","subscription_id"]
 
-
     @abstractmethod
-    def init_dns_client(self):
+    def create_dns_client(self, credential:ClientSecretCredential, subscription_id) -> any:
         pass
 
-    @abstractmethod
-    def get_azure_dns_client_instance(self):
-        pass
+    def get_azure_dns_client_instance(self, zone_name):
+        return self.zone_clients[zone_name]
 
     @abstractmethod
     def get_zone_name_param_name(self) -> str:
@@ -93,7 +96,7 @@ class BaseAzureDnsProvider(BaseDnsProvider):
             
             # https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/network/azure-mgmt-dns/azure/mgmt/dns/v2018_05_01/models/_models_py3.py#L288
             record_set_params = self.get_record_set_params(name,cname_target,relative_record_set_name,zone_config)
-            record_set:RecordSet = self.get_azure_dns_client_instance().record_sets.create_or_update(**record_set_params)
+            record_set:RecordSet = self.get_azure_dns_client_instance(zone_config["zone_name"]).record_sets.create_or_update(**record_set_params)
 
             self.logger.debug(f"ensure_cname_for_acme_dns() {self.get_dns_provider_name()} processed {name} ({relative_record_set_name}) -> {cname_target}")
 
