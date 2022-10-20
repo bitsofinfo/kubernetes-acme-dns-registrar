@@ -35,3 +35,20 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/kubernetes-acme-dns-registrar:${{ env.VERSION_NUMBER }},${{ secrets.DOCKERHUB_USERNAME }}/kubernetes-acme-dns-registrar:latest-dev
+
+      - name: Tagged set version number
+        if: startsWith(github.ref, 'refs/tags') == true
+        run: |
+          pwd
+          ls -al 
+          pip install --upgrade dunamai
+          export TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "TAG_NAME: $TAG_NAME"
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+      
+      - name: Tagged Build and push
+        if: startsWith(github.ref, 'refs/tags') == true
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kubernetes-acme-dns-registrar:${{ env.TAG_NAME }},${{ secrets.DOCKERHUB_USERNAME }}/kubernetes-acme-dns-registrar:latest
