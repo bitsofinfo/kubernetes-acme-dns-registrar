@@ -17,3 +17,5 @@ azure-mgmt-privatedns==1.0.0
 azure-identity==1.10.0
 msrestazure==0.6.4
 pyyaml==6.0
+
+cloudflare==2.10.2

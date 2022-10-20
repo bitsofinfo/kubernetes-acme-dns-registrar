@@ -8,6 +8,8 @@ secrets*
 *secrets*
 my.*.yaml
 
+LOCAL-DEV.md
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

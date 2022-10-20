@@ -18,19 +18,21 @@
 
 dns_providers:
 
-  # example for azuredns
-  azuredns:
+  #--------------------------
+  # example for CLOUDFLARE
+  #--------------------------
+  cloudflare:
+
+    # provider is enabled or not?
+    enabled: false
 
     # common settings, can be overriden per zone below
-    subscription_id: xxx
-    tenant_id: yyy
-    client_id: zzz
+    zone_id: xxx
 
     zones:
 
       # zones that we will manage CNAME records in
       my-domain.net:
-        resource_group_name: some-rg,
         zone_name: my-domain.net
         ttl: 300
 
@@ -43,7 +45,42 @@ dns_providers:
         # ignore/exclude dns CNAMEs management for 
         # AcmeDnsRegistationEvent.Registration.cname_name
         # that matches the following patterns (ANY match)
-        excludes: null,
+        excludes: null
+
+        # optional can override the top level settings here per zone
+        #zone_id: yyy
+
+  #--------------------------
+  # example for AZUREDNS
+  #--------------------------
+  azuredns:
+
+    # provider is enabled or not?
+    enabled: false
+
+    # common settings, can be overriden per zone below
+    subscription_id: xxx
+    tenant_id: yyy
+    client_id: zzz
+
+    zones:
+
+      # zones that we will manage CNAME records in
+      my-domain.net:
+        resource_group_name: some-rg
+        zone_name: my-domain.net
+        ttl: 300
+
+        # only manage dns CNAMEs for 
+        # AcmeDnsRegistationEvent.Registration.cname_name 
+        # that matches the following patterns (ANY match)
+        includes: 
+          - ".+\\.my-domain\\.net"
+
+        # ignore/exclude dns CNAMEs management for 
+        # AcmeDnsRegistationEvent.Registration.cname_name
+        # that matches the following patterns (ANY match)
+        excludes: null
 
         # optional can override the top level settings here per zone
         #subscription_id: xxx
