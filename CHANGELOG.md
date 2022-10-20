@@ -2,6 +2,7 @@
 
 - Cloudflare dns provider support
 - optional `enabled: true|false` in dns providers config yaml
+- helm chart 0.0.2 (functionally the same)
 
 # 0.0.1-f
 
