@@ -7,12 +7,12 @@
 # https://docs.microsoft.com/en-us/azure/devops/artifacts/quickstarts/python-packages
 #-----------------------------------------
 #
-FROM python:3.10.4-alpine3.15 as build
+FROM python:3.11.1-alpine3.17 as build
 
 # the system dependencies required for any of our 
 # app specific python modules we will be installing
 #
-RUN apk add libxml2-dev libxslt-dev python3-dev gcc build-base libxslt libxml2 libffi-dev
+RUN apk add --no-cache libxml2-dev libxslt-dev python3-dev gcc build-base libxslt libxml2 libffi-dev
 
 #
 # Create a virtual env for our python environment
@@ -29,7 +29,8 @@ COPY requirements.txt /opt/build
 RUN cd /opt/build && \
     source /opt/venv/bin/activate && \
     pip install -r requirements-dev.txt && \
-    pip install -r requirements.txt
+    pip install -r requirements.txt && \
+    pip uninstall -y setuptools 
 
 # ----------------
 # END build layer
@@ -46,16 +47,29 @@ RUN cd /opt/build && \
 # and anything else you need
 # 
 # --------------------------------
-FROM python:3.10.4-alpine3.15 as release
+FROM python:3.11.1-alpine3.17 as release
 COPY --from=build /opt/venv /opt/venv
+
+RUN pip uninstall -y setuptools
 
 # install app etc
 COPY main.py /opt/scripts/main.py
 COPY core /opt/scripts/core
 ENV PATH="/opt/scripts:/opt/venv/bin:$PATH"
-WORKDIR /opt/scripts
+
 
 # https://www.uvicorn.org/#command-line-options
-ADD docker_resources/entrypoint.sh /entrypoint.sh
-RUN chmod 755 /entrypoint.sh
+COPY docker_resources/entrypoint.sh /entrypoint.sh
+
+ARG USER=kadr
+RUN adduser -D $USER
+ENV HOME /home/${USER}
+
+RUN chown -R ${USER}:${USER} /opt/venv 
+RUN chown -R ${USER}:${USER} /opt/scripts
+RUN chown -R ${USER}:${USER} /entrypoint.sh
+RUN chmod 750 /entrypoint.sh
+
+USER ${USER}
+WORKDIR /opt/scripts
 ENTRYPOINT ["sh","/entrypoint.sh"]

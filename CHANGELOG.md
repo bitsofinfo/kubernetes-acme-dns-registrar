@@ -1,3 +1,7 @@
+# 0.0.3 
+
+- dependencies updates, Dockerfile updates
+
 # 0.0.2 
 
 - Cloudflare dns provider support
