@@ -1,6 +1,7 @@
 # 0.0.3 
 
 - dependencies updates, Dockerfile updates
+- helm chart updates for security context
 
 # 0.0.2 
 

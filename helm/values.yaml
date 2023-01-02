@@ -8,6 +8,9 @@
 deployment:
   image: registry.hub.docker.com/bitsofinfo/kubernetes-acme-dns-registrar
   tag: latest
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
   
 #####################################################
 #

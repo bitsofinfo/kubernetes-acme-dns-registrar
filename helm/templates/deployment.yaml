@@ -63,6 +63,14 @@ spec:
       containers:
       - name: kubernetes-acme-dns-registrar
         image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: {{ .Values.deployment.runAsUser }}
+          runAsGroup: {{ .Values.deployment.runAsGroup }}
+          fsGroup: {{ .Values.deployment.fsGroup }}
+
         ports:
           - containerPort: 8000
 
