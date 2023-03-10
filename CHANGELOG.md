@@ -1,3 +1,7 @@
+# 0.0.4
+
+- helm chart updates for security context: `runAsNonRoot`
+
 # 0.0.3 
 
 - dependencies updates, Dockerfile updates

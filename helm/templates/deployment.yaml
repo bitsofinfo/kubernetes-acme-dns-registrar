@@ -32,6 +32,7 @@ spec:
         runAsUser: {{ .Values.deployment.runAsUser }}
         runAsGroup: {{ .Values.deployment.runAsGroup }}
         fsGroup: {{ .Values.deployment.fsGroup }}
+        runAsNonRoot:  {{ .Values.deployment.runAsNonRoot }}
 
       volumes:
         - name: kadr-configs
