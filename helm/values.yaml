@@ -12,6 +12,7 @@ deployment:
   runAsGroup: 1000
   fsGroup: 1000
   runAsNonRoot: true
+  seccompProfileType: RuntimeDefault
   
 #####################################################
 #

@@ -1,3 +1,7 @@
+# 0.0.5
+
+- helm chart updates for security context: `seccompProfileType`
+
 # 0.0.4
 
 - helm chart updates for security context: `runAsNonRoot`

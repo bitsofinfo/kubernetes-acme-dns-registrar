@@ -33,6 +33,8 @@ spec:
         runAsGroup: {{ .Values.deployment.runAsGroup }}
         fsGroup: {{ .Values.deployment.fsGroup }}
         runAsNonRoot:  {{ .Values.deployment.runAsNonRoot }}
+        seccompProfile:
+          type: {{ .Values.deployment.seccompProfileType }}
 
       volumes:
         - name: kadr-configs

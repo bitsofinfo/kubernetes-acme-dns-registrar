@@ -2,8 +2,17 @@ apiVersion: v1
 entries:
   kubernetes-acme-dns-registrar:
   - apiVersion: v1
+    appVersion: 0.0.5
+    created: "2023-03-10T13:29:58.441038-07:00"
+    description: Chart for installing kubernetes-acme-dns-registrar
+    digest: 050b2e2930f53e8d0b531b262e8418e95248409140ea3ea7666ba5300805f44c
+    name: kubernetes-acme-dns-registrar
+    urls:
+    - charts/kubernetes-acme-dns-registrar-0.0.5.tgz
+    version: 0.0.5
+  - apiVersion: v1
     appVersion: 0.0.4
-    created: "2023-03-10T09:34:15.369129-07:00"
+    created: "2023-03-10T13:29:58.440739-07:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: e20c38316438f4c9d5c8f512ee2508547d10fc2eef79e3df700b3ccd0c2a13b0
     name: kubernetes-acme-dns-registrar
@@ -12,7 +21,7 @@ entries:
     version: 0.0.4
   - apiVersion: v1
     appVersion: 0.0.3
-    created: "2023-03-10T09:34:15.368734-07:00"
+    created: "2023-03-10T13:29:58.440113-07:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: 89df410447ee90788056a9bfefd1dfb9d962a9564ba536b414ba895d013cabbd
     name: kubernetes-acme-dns-registrar
@@ -21,7 +30,7 @@ entries:
     version: 0.0.3
   - apiVersion: v1
     appVersion: 0.0.2
-    created: "2023-03-10T09:34:15.368321-07:00"
+    created: "2023-03-10T13:29:58.439812-07:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: 10a2b48b195a89c6cbed1b5a479e250f52b5c205d742873d57a15ba35267f76b
     name: kubernetes-acme-dns-registrar
@@ -30,7 +39,7 @@ entries:
     version: 0.0.2
   - apiVersion: v1
     appVersion: 0.0.1
-    created: "2023-03-10T09:34:15.367942-07:00"
+    created: "2023-03-10T13:29:58.439486-07:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: 97bb26ea01d484de0e03fe0c1d8504e0dffa46c3c24efb666ab6bd16a8f7e14d
     name: kubernetes-acme-dns-registrar
@@ -39,7 +48,7 @@ entries:
     version: 0.0.1
   - apiVersion: v1
     appVersion: 0.0.1-f
-    created: "2023-03-10T09:34:15.367615-07:00"
+    created: "2023-03-10T13:29:58.439237-07:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: 7f7057bca43e3f8148208ab1c6941d719bfd57f92c270403e03fcd17b9bc9d80
     name: kubernetes-acme-dns-registrar
@@ -48,7 +57,7 @@ entries:
     version: 0.0.1-f
   - apiVersion: v1
     appVersion: 0.0.1-e
-    created: "2023-03-10T09:34:15.366245-07:00"
+    created: "2023-03-10T13:29:58.438888-07:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: 7e07d552157e5670ecc3bd7aea99ad6bdcd0fbddef3ea930f7e224fa50fff787
     name: kubernetes-acme-dns-registrar
@@ -57,7 +66,7 @@ entries:
     version: 0.0.1-e
   - apiVersion: v1
     appVersion: 0.0.1-d
-    created: "2023-03-10T09:34:15.365855-07:00"
+    created: "2023-03-10T13:29:58.438544-07:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: 0bbaf821805c6338d249466ec38d35bd5d02b1be79069a2fbfdd8bede9c678ae
     name: kubernetes-acme-dns-registrar
@@ -66,7 +75,7 @@ entries:
     version: 0.0.1-d
   - apiVersion: v1
     appVersion: 0.0.1-c
-    created: "2023-03-10T09:34:15.365493-07:00"
+    created: "2023-03-10T13:29:58.438171-07:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: cd2a4590e2ad54f67b7f72204bc2ff22196ad8dad837976026cd79c497048a80
     name: kubernetes-acme-dns-registrar
@@ -75,11 +84,11 @@ entries:
     version: 0.0.1-c
   - apiVersion: v1
     appVersion: 0.0.1-b
-    created: "2023-03-10T09:34:15.365096-07:00"
+    created: "2023-03-10T13:29:58.43767-07:00"
     description: Chart for installing kubernetes-acme-dns-registrar
     digest: 11589a74e5470fe405f61238f6d5ada538432041ba40c0fbc79e0295f89536f3
     name: kubernetes-acme-dns-registrar
     urls:
     - charts/kubernetes-acme-dns-registrar-0.0.1-b.tgz
     version: 0.0.1-b
-generated: "2023-03-10T09:34:15.364511-07:00"
+generated: "2023-03-10T13:29:58.435844-07:00"
