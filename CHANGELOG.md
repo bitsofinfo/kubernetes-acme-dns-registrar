@@ -1,3 +1,7 @@
+# 0.0.6
+
+- helm chart updates for security context: `securityContextCapabilities`
+
 # 0.0.5
 
 - helm chart updates for security context: `seccompProfileType`

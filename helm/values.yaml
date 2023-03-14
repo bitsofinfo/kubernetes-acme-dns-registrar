@@ -13,6 +13,8 @@ deployment:
   fsGroup: 1000
   runAsNonRoot: true
   seccompProfileType: RuntimeDefault
+  securityContextCapabilities:
+    drop: [ALL]
   
 #####################################################
 #
