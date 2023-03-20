@@ -35,8 +35,8 @@ spec:
         runAsNonRoot:  {{ .Values.deployment.runAsNonRoot }}
         seccompProfile:
           type: {{ .Values.deployment.seccompProfileType }}
-        {{- if hasKey .Values.securityContextCapabilities "drop" }}
-        capabilities: {{- .Values.securityContextCapabilities | toYaml | nindent 10 }}
+        {{- if hasKey .Values.deployment.securityContextCapabilities "drop" }}
+        capabilities: {{- .Values.deployment.securityContextCapabilities | toYaml | nindent 10 }}
         {{- end }}
         
       volumes:
