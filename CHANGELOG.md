@@ -1,3 +1,7 @@
+# 0.0.7
+
+- helm chart updates for security context: `securityContextCapabilities` syntax change
+
 # 0.0.6
 
 - helm chart updates for security context: `securityContextCapabilities`
