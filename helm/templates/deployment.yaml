@@ -35,9 +35,6 @@ spec:
         runAsNonRoot:  {{ .Values.deployment.runAsNonRoot }}
         seccompProfile:
           type: {{ .Values.deployment.seccompProfileType }}
-        {{- if hasKey .Values.deployment.securityContextCapabilities "drop" }}
-        capabilities: {{- .Values.deployment.securityContextCapabilities | toYaml | nindent 10 }}
-        {{- end }}
         
       volumes:
         - name: kadr-configs
@@ -78,7 +75,10 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
-
+          {{- if hasKey .Values.deployment.securityContextCapabilities "drop" }}
+          capabilities: {{- .Values.deployment.securityContextCapabilities | toYaml | nindent 10 }}
+          {{- end }}
+          
         ports:
           - containerPort: 8000
 
