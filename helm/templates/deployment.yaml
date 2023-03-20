@@ -76,9 +76,9 @@ spec:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
           {{- if hasKey .Values.deployment.securityContextCapabilities "drop" }}
-          capabilities: {{- .Values.deployment.securityContextCapabilities | toYaml | nindent 10 }}
+          capabilities: {{- .Values.deployment.securityContextCapabilities | toYaml | nindent 12 }}
           {{- end }}
-          
+
         ports:
           - containerPort: 8000
 
